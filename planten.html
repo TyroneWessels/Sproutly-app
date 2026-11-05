@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bekijk alle planten in Sproutly en vind snel de juiste verzorgingsinformatie." />
+  <title>Alle planten | Sproutly</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f7259'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='white'%3E✦%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="catalog-page">
+  <a class="skip-link" href="#catalog-main">Ga naar hoofdinhoud</a>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="index.html#discover" aria-label="Sproutly startpagina">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <span>sproutly</span>
+      </a>
+      <nav class="main-nav" aria-label="Hoofdnavigatie">
+        <a href="index.html#discover">Ontdek</a>
+        <a class="active" href="planten.html">Alle planten</a>
+        <a href="index.html#my-plants">Mijn planten</a>
+        <a href="index.html#calendar-view">Verzorgingskalender</a>
+      </nav>
+      <a class="profile-button catalog-account-link" href="index.html#my-plants">Mijn planten</a>
+    </header>
+
+    <main id="catalog-main">
+      <section class="catalog-intro" aria-labelledby="catalog-title">
+        <p class="eyebrow">De Sproutly-bibliotheek</p>
+        <h1 id="catalog-title">Vind jouw volgende<br /><em>groene vriend.</em></h1>
+        <p>Doorzoek alle planten, kruiden en groenten uit de Sproutly-collectie. Bewaar een plant om deze terug te vinden in Mijn planten.</p>
+      </section>
+
+      <section class="catalog-controls" aria-label="Planten zoeken en filteren">
+        <label class="catalog-search">
+          <span class="sr-only">Zoek in alle planten</span>
+          <span aria-hidden="true">⌕</span>
+          <input id="catalog-search" type="search" placeholder="Zoek op naam, categorie of licht..." autocomplete="off" />
+        </label>
+        <div class="catalog-filters">
+          <div class="filter-tabs" role="group" aria-label="Filter op plaats">
+            <button class="filter-tab active" type="button" data-catalog-filter="all">Alle planten</button>
+            <button class="filter-tab" type="button" data-catalog-filter="indoor">Binnen</button>
+            <button class="filter-tab" type="button" data-catalog-filter="outdoor">Buiten</button>
+          </div>
+          <label class="filter-select">
+            <span class="sr-only">Filter op lichtbehoefte</span>
+            <select id="catalog-light">
+              <option value="all">Alle lichtsoorten</option>
+              <option value="low">Weinig licht</option>
+              <option value="medium">Indirect licht</option>
+              <option value="high">Veel licht</option>
+            </select>
+          </label>
+          <label class="filter-select">
+            <span class="sr-only">Filter op moeilijkheid</span>
+            <select id="catalog-difficulty">
+              <option value="all">Elke moeilijkheid</option>
+              <option value="easy">Makkelijk</option>
+              <option value="medium">Gemiddeld</option>
+            </select>
+          </label>
+          <label class="filter-select">
+            <span class="sr-only">Sorteer planten</span>
+            <select id="catalog-sort">
+              <option value="relevance">Relevantie</option>
+              <option value="name">Naam A–Z</option>
+              <option value="difficulty">Moeilijkheid</option>
+            </select>
+          </label>
+        </div>
+        <p class="catalog-result-count" id="catalog-result-count" role="status" aria-live="polite"></p>
+      </section>
+
+      <section aria-labelledby="catalog-results-title">
+        <h2 class="sr-only" id="catalog-results-title">Plantresultaten</h2>
+        <div class="plant-grid catalog-grid" id="catalog-grid"></div>
+        <p class="empty-state" id="catalog-empty" hidden>Geen planten gevonden. Probeer een andere zoekopdracht of filter.</p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© <span id="catalog-year">2026</span> Sproutly · <a href="index.html#privacy">Privacy</a></span>
+      <span>Gemaakt voor nieuwsgierige kwekers <span aria-hidden="true">♡</span></span>
+    </footer>
+  </div>
+  <div class="toast" id="catalog-toast" role="status" aria-live="polite"></div>
+  <script src="catalogus.js"></script>
+</body>
+</html>
