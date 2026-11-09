@@ -449,6 +449,14 @@ h1 em, h2 em, h2 span { color: #a44f35; }
 .eyebrow { font-size: 13px; letter-spacing: .1em; }
 .hero { background: radial-gradient(circle at 8% 12%, #f8f6df 0, transparent 31%), linear-gradient(120deg, #e1efda, #cfe4ce); }
 .hero-description { max-width: 380px; color: var(--muted); font-size: 17px; }
+.tour-start { margin: 0 0 18px; min-height: 44px; }
+.tour-card { position: relative; width: min(100%, 520px); max-height: 90vh; overflow-y: auto; padding: 38px; border: 1px solid #d5e0d1; border-radius: 20px 20px 20px 6px; background: url("assets/botanical-sprig.svg") no-repeat right 12px top 44px / 70px auto, linear-gradient(135deg, #fffdf8, #f1f7e9); box-shadow: 0 16px 40px rgba(23,60,50,.2); }
+.tour-card h2 { max-width: 330px; padding-right: 35px; font-size: clamp(30px, 5vw, 40px); line-height: 1.1; }
+.tour-card > p:not(.eyebrow) { font-size: 16px; line-height: 1.6; }
+.tour-progress { color: var(--muted); }
+.tour-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+.tour-actions button[hidden] { display: none; }
+@media (max-width: 400px) { .tour-card { padding: 28px 24px; } }
 .search-form { height: auto; min-height: 56px; border-radius: 14px; }
 .search-form input::placeholder { color: #637a6d; }
 .quick-searches, .quick-searches button { font-size: 14px; }

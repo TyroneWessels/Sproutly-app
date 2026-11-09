@@ -409,7 +409,8 @@ De onderstaande voorstellen zijn **nog niet gerealiseerd**:
 
 1. **Verwijderde plant herstellen:** bied ongedaan maken of een tijdelijke prullenbak. Herstel het specifieke exemplaar met profiel, foto, logboek en bijbehorende planning; communiceer een eventuele bewaartermijn en vraag waar nodig bevestiging.
 2. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
-3. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
+
+De optionele rondleiding op de homepage legt zoeken, toevoegen en verzorgen uit. De gebruiker opent deze zelf, kan de rondleiding op elk moment sluiten en later opnieuw openen.
 
 **Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
 

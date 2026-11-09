@@ -22,7 +22,7 @@
 - [x] Een aparte plantpagina met informatie, verzorging en persoonlijke gegevens.
 - [x] Meldingen voor acties via toastberichten.
 - [ ] Leesbaarheid en begrijpelijkheid testen met echte gebruikers, waaronder oudere en minder digitaal vaardige gebruikers. Een zelftest in de browser is uitgevoerd.
-- [ ] Een korte rondleiding voor nieuwe gebruikers toevoegen: plant zoeken, toevoegen en verzorging bijhouden; overslaan en later opnieuw openen mogelijk maken.
+- [x] Een korte rondleiding voor nieuwe gebruikers toevoegen: plant zoeken, toevoegen en verzorging bijhouden; overslaan en later opnieuw openen mogelijk maken.
 - [x] Kleurcontrast controleren volgens WCAG-richtlijnen. Belangrijke tekstcombinaties gecontroleerd en onvoldoende secundaire tekstkleuren donkerder gemaakt.
 - [x] Focusstijlen en toetsenbordnavigatie op alle interactieve onderdelen controleren. Zichtbare focusstijl toegevoegd en Tab-navigatie gecontroleerd in de browser.
 - [x] Een foutmelding toevoegen wanneer een plantafbeelding niet geladen kan worden. Niet-beschikbare afbeeldingen tonen nu een duidelijke inline fallback.

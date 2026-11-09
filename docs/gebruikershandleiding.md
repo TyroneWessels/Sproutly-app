@@ -1,5 +1,7 @@
 # Sproutly gebruikershandleiding
 
+Op de homepage kun je met **Bekijk de korte rondleiding** uitleg krijgen over zoeken, toevoegen en verzorgen. Je kunt de rondleiding sluiten en later opnieuw openen.
+
 ## Een plant zoeken
 
 1. Open Sproutly.
