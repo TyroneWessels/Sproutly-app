@@ -190,7 +190,8 @@ let activeHemisphere = "north";
 let calendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let selectedCalendarDate = new Date();
 const storedPlants = localStorage.getItem("sproutly-plants");
-let savedPlants = new Set(storedPlants ? JSON.parse(storedPlants) : ["Monstera", "Basilicum", "Lavendel"]);
+let savedPlants = new Set(storedPlants ? JSON.parse(storedPlants) : window.SPROUTLY_DEFAULT_SAVED_PLANTS);
+if (!storedPlants) localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
 let completedTasks = new Set(JSON.parse(localStorage.getItem("sproutly-tasks") || "[]"));
 let plantProfiles = JSON.parse(localStorage.getItem("sproutly-profiles") || "{}");
 let careOverrides = JSON.parse(localStorage.getItem("sproutly-care-overrides") || "{}");
@@ -202,14 +203,20 @@ let authMode = "login";
 const gbifCache = new Map();
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(path, {
-    credentials: "same-origin",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
-  });
+  let response;
+  try {
+    response = await fetch(path, {
+      credentials: "same-origin",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+  } catch (error) {
+    console.error(`Sproutly-server niet bereikbaar voor ${path}:`, error);
+    throw new Error("De accountserver is niet bereikbaar. Start Sproutly met `node .\\server.js` en open daarna http://localhost:3000.");
+  }
 
   notificationButton.addEventListener("click", () => document.querySelector("#reminder-button").click());
   collectionMoreButton.addEventListener("click", () => {
@@ -343,7 +350,7 @@ function setAuthMode(mode) {
 function openAuthModal() {
   setAuthMode(currentUser ? "login" : authMode);
   if (!backendAvailable && !currentUser) {
-    authStatus.textContent = "Start Sproutly via node server.js om accounts te gebruiken.";
+    authStatus.textContent = "Accounts werken via de Sproutly-server. Start `node .\\server.js` en open http://localhost:3000.";
   }
   authModal.hidden = false;
   (currentUser ? logoutButton : authEmail).focus();
@@ -548,11 +555,11 @@ function renderPlants(query = "") {
   plantGrid.innerHTML = sortedPlants.map((plant) => `
     <article class="plant-card">
       <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" data-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Bewaar"} ${plant.name}">${savedPlants.has(plant.name) ? "♥" : "♡"}</button>
-      <button class="plant-art ${plant.art}" data-plant="${plant.name}" aria-label="Bekijk details van ${plant.name}">
+      <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk details van ${plant.name}">
         <img class="plant-photo" src="${plant.imageUrl}" alt="${plant.name}" loading="lazy" decoding="async" />
-      </button>
+      </a>
       <span class="plant-tag">${plant.category}</span>
-      <h3>${plant.name}</h3>
+      <h3><a href="plant.html?naam=${encodeURIComponent(plant.name)}">${plant.name}</a></h3>
       <p class="scientific-name">${plant.scientific}</p>
       <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
@@ -636,9 +643,13 @@ function clearStoredLocalState() {
 }
 
 function renderCollection() {
-  const saved = plants.filter((plant) => savedPlants.has(plant.name));
+  const saved = window.SPROUTLY_PLANTS.filter((plant) => savedPlants.has(plant.name)).map((plant) => ({
+    ...plant,
+    ...plants.find((item) => item.name === plant.name),
+    imageUrl: plant.image
+  }));
   collectionCount.textContent = `${saved.length} ${saved.length === 1 ? "groene vriend" : "groene vrienden"}`;
-  navCount.textContent = String(saved.length);
+  navCount.textContent = String(savedPlants.size);
   if (!saved.length) {
     collectionList.innerHTML = `<div class="collection-empty"><p>Je collectie is nog leeg. Voeg je eerste plant toe.</p><button class="primary-button" data-empty-action>Plant zoeken</button></div>`;
     collectionList.querySelector("[data-empty-action]").addEventListener("click", () => {
@@ -648,11 +659,11 @@ function renderCollection() {
     return;
   }
   collectionList.innerHTML = saved.map((plant) => `
-    <div class="collection-item">
+    <a class="collection-item" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk ${escapeHtml(plantProfiles[plant.name]?.customName || plant.name)}">
       <img class="mini-plant" src="${plantProfiles[plant.name]?.photo || plant.imageUrl}" alt="" loading="lazy" decoding="async" />
       <span><strong>${escapeHtml(plantProfiles[plant.name]?.customName || plant.name)}</strong><small>${escapeHtml(plantProfiles[plant.name]?.location || plant.scientific)}</small></span>
-      <span class="status-pill ${plant.statusClass}">${plant.status}</span>
-    </div>
+      <span class="status-pill ${plant.statusClass || "status-good"}">${plant.status || "Bekijk je plant"}</span>
+    </a>
   `).join("");
   collectionList.querySelectorAll(".mini-plant").forEach((image) => image.addEventListener("error", handleImageError, { once: true }));
 }
@@ -911,6 +922,7 @@ document.querySelector("#modal-add").addEventListener("click", () => {
 profileForm.addEventListener("submit", (event) => {
   event.preventDefault();
   const profile = {
+    ...plantProfiles[activePlantName],
     customName: profileName.value.trim(),
     location: profileLocation.value.trim(),
     date: profileDate.value,

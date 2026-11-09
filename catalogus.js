@@ -9,10 +9,13 @@ const catalogEmpty = document.querySelector("#catalog-empty");
 const catalogResultCount = document.querySelector("#catalog-result-count");
 const catalogToast = document.querySelector("#catalog-toast");
 let catalogFilter = "all";
-let savedPlants = new Set(JSON.parse(localStorage.getItem("sproutly-plants") || "[]"));
+const storedPlants = localStorage.getItem("sproutly-plants");
+let savedPlants = new Set(storedPlants ? JSON.parse(storedPlants) : window.SPROUTLY_DEFAULT_SAVED_PLANTS);
+if (!storedPlants) localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
 let currentUser = null;
 let backendAvailable = false;
 const navCount = document.querySelector("#nav-count");
+let accountState = { savedPlants: [...savedPlants], plantProfiles: {}, completedTasks: [], careOverrides: {} };
 
 function updateNavCount() {
   if (navCount) navCount.textContent = String(savedPlants.size);
@@ -32,24 +35,24 @@ function showCatalogToast(message) {
 }
 
 async function syncCatalogState() {
+  localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
   if (!currentUser) {
-    localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
     return;
   }
-  const state = {
+  accountState = {
+    ...accountState,
     savedPlants: [...savedPlants],
-    plantProfiles: {},
-    completedTasks: [],
-    careOverrides: {}
   };
   try {
-    await fetch("/api/me/state", {
+    const response = await fetch("/api/me/state", {
       method: "PUT",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(state)
+      body: JSON.stringify(accountState)
     });
+    if (!response.ok) throw new Error(`Opslaan is mislukt (HTTP ${response.status}).`);
   } catch (error) {
+    console.error("Collectie kon niet naar het account worden opgeslagen:", error);
     showCatalogToast("De wijziging kon niet naar je account worden opgeslagen.");
   }
 }
@@ -64,8 +67,15 @@ async function initializeCatalogSession() {
     currentUser = session.user;
     if (currentUser) {
       const stateResponse = await fetch("/api/me/state", { credentials: "same-origin" });
+      if (!stateResponse.ok) throw new Error(`Accountgegevens laden is mislukt (HTTP ${stateResponse.status}).`);
       const state = await stateResponse.json();
-      savedPlants = new Set(Array.isArray(state.savedPlants) ? state.savedPlants : []);
+      accountState = {
+        savedPlants: Array.isArray(state.savedPlants) ? state.savedPlants : [],
+        plantProfiles: state.plantProfiles && typeof state.plantProfiles === "object" ? state.plantProfiles : {},
+        completedTasks: Array.isArray(state.completedTasks) ? state.completedTasks : [],
+        careOverrides: state.careOverrides && typeof state.careOverrides === "object" ? state.careOverrides : {}
+      };
+      savedPlants = new Set(accountState.savedPlants);
       updateNavCount();
       renderCatalog();
     }
@@ -96,13 +106,14 @@ function renderCatalog() {
       <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" type="button" data-catalog-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Voeg toe"} ${plant.name}">
         ${savedPlants.has(plant.name) ? "♥ Opgeslagen" : "♡ Aan mijn planten"}
       </button>
-      <div class="plant-art ${plant.art}">
+      <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk ${plant.name}">
         <img class="plant-photo" src="${plant.image}" alt="${plant.name}" loading="lazy" decoding="async" />
-      </div>
+      </a>
       <span class="plant-tag">${plant.category}</span>
-      <h3>${plant.name}</h3>
+      <h3><a href="plant.html?naam=${encodeURIComponent(plant.name)}">${plant.name}</a></h3>
       <p class="scientific-name">${plant.scientific}</p>
       <p class="catalog-card-meta">${plant.light} · ${plant.difficulty === "easy" ? "Makkelijk" : "Gemiddeld"}</p>
+      <a class="plant-details-link" href="plant.html?naam=${encodeURIComponent(plant.name)}">Bekijk plant en verzorging →</a>
       <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
   `).join("");
@@ -128,10 +139,10 @@ catalogGrid.addEventListener("click", async (event) => {
   const name = button.dataset.catalogSave;
   if (savedPlants.has(name)) {
     savedPlants.delete(name);
-    showCatalogToast(`${name} is verwijderd uit je planten`);
+    showCatalogToast(`${name} is verwijderd. Je collectie is bijgewerkt.`);
   } else {
     savedPlants.add(name);
-    showCatalogToast(`${name} is toegevoegd aan je planten`);
+    showCatalogToast(`${name} is toegevoegd aan je planten.`);
   }
   renderCatalog();
   await syncCatalogState();

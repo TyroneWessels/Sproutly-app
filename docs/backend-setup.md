@@ -13,11 +13,13 @@ Open PowerShell in de projectmap en voer uit:
 node .\server.js
 ```
 
-Open daarna:
+Open de app daarna via de Node-server:
 
 ```text
 http://localhost:3000
 ```
+
+Open `index.html` niet rechtstreeks via `file://` en gebruik voor accountfuncties niet een aparte statische previewserver. Aanmelden, inloggen en accountsynchronisatie gebruiken de API van deze Node-server.
 
 De backend maakt bij de eerste start automatisch `data/sproutly.json` aan. Dit bestand bevat accounts, sessies en server-side Sproutly-status.
 

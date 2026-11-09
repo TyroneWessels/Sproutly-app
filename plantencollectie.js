@@ -33,6 +33,8 @@ window.SPROUTLY_PLANTS = [
   { name: "Ficus benjamina", aliases: ["treurvijg", "weeping fig"], scientific: "Ficus benjamina", category: "Binnenplant", filter: "indoor", art: "art-monstera", light: "Helder indirect licht", lightLevel: "medium", difficulty: "medium", type: "Kamerplant" }
 ];
 
+window.SPROUTLY_DEFAULT_SAVED_PLANTS = ["Monstera", "Basilicum", "Lavendel"];
+
 const speciesPhotos = {
   "Monstera deliciosa": ["2/2e", "Monstera_deliciosa2.jpg"],
   "Ocimum basilicum": ["9/97", "Ocimum_basilicum_8zz.jpg"],
@@ -59,7 +61,7 @@ const speciesPhotos = {
   "Tradescantia zebrina": ["f/fd", "Zebrina_pendula_20060521_2_closer.jpg"],
   "Chamaedorea elegans": ["6/64", "Chamaedorea_elegans_Mart.JPG"],
   "Peperomia obtusifolia": ["1/19", "Peperomia_obtusifolia_3-OB9.jpg"],
-  "Beaucarnea recurvata": ["7/7e", "Beaucarnea_recurvata%2C_Ocampo%2C_Tamaulipas%2C_Mexico_1.jpg"],
+  "Beaucarnea recurvata": ["b/b2", "Beaucarnea_recurvata_%28Ponytail_Palm%291.jpg"],
   "Crassula ovata": ["5/5a", "Crassula_ovata_700.jpg"],
   "Phalaenopsis amabilis": ["1/1b", "Phalaenopsis_amabilis_Orchi_02.jpg"],
   "Nephrolepis exaltata": ["3/30", "Boston_Fern_%282873392811%29.png"],
@@ -68,14 +70,51 @@ const speciesPhotos = {
   "Ficus benjamina": ["1/19", "Starr-080608-7576-Ficus_benjamina-habit_with_Laysan_albatross-Gym_Sand_Island-Midway_Atoll_%2824823189861%29.jpg"]
 };
 
+const soilCheckIntervals = {
+  "Monstera deliciosa": 7,
+  "Ocimum basilicum": 3,
+  "Lavandula angustifolia": 10,
+  "Dracaena trifasciata": 21,
+  "Aloe barbadensis miller": 21,
+  "Solanum lycopersicum": 3,
+  "Salvia rosmarinus": 10,
+  "Pilea peperomioides": 7,
+  "Epipremnum aureum": 7,
+  "Spathiphyllum wallisii": 5,
+  "Zamioculcas zamiifolia": 21,
+  "Chlorophytum comosum": 7,
+  "Ficus elastica": 10,
+  "Ficus lyrata": 7,
+  "Philodendron hederaceum": 7,
+  "Dracaena marginata": 14,
+  "Aglaonema commutatum": 10,
+  "Goeppertia makoyana": 5,
+  "Pachira aquatica": 7,
+  "Dypsis lutescens": 7,
+  "Hoya carnosa": 14,
+  "Curio rowleyanus": 21,
+  "Tradescantia zebrina": 5,
+  "Chamaedorea elegans": 7,
+  "Peperomia obtusifolia": 10,
+  "Beaucarnea recurvata": 21,
+  "Crassula ovata": 21,
+  "Phalaenopsis amabilis": 10,
+  "Nephrolepis exaltata": 4,
+  "Codiaeum variegatum": 7,
+  "Anthurium andraeanum": 7,
+  "Ficus benjamina": 7
+};
+
 window.SPROUTLY_PLANTS.forEach((plant) => {
   const photo = speciesPhotos[plant.scientific];
   if (!photo) throw new Error(`Geen foto ingesteld voor ${plant.scientific}`);
   const [, fileName] = photo;
   const slug = plant.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   const extension = ["Aloe barbadensis miller", "Nephrolepis exaltata"].includes(plant.scientific) ? "png" : "jpg";
-  plant.image = `assets/plants/${slug}.${extension}`;
+  const imageSlug = plant.scientific === "Beaucarnea recurvata" ? "olifantspoot-kamerplant" : slug;
+  plant.image = `assets/plants/${imageSlug}.${extension}`;
   plant.imageSource = `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(decodeURIComponent(fileName)).replace(/%20/g, "_")}`;
+  plant.soilCheckDays = soilCheckIntervals[plant.scientific] || 7;
 });
 
 window.handlePlantImageError = (event) => {

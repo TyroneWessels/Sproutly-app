@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bekijk de plant, verzorging en je eigen plantenlogboek." />
+  <title>Plant | Sproutly</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f7259'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='white'%3E✦%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="sub-page">
+  <a class="skip-link" href="#plant-main">Ga naar hoofdinhoud</a>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Sproutly startpagina"><span class="brand-mark" aria-hidden="true">✦</span><span>sproutly</span></a>
+      <nav class="main-nav" aria-label="Hoofdnavigatie">
+        <a href="index.html">Ontdek</a><a href="planten.html">Alle planten</a><a href="mijn-planten.html">Mijn planten <span class="nav-count" id="nav-count">0</span></a><a href="kalender.html">Verzorgingskalender</a>
+      </nav>
+      <div class="header-actions">
+        <a class="icon-button notification-button" href="kalender.html" aria-label="Bekijk verzorgingskalender"><span aria-hidden="true">♧</span><i></i></a>
+        <a class="profile-button" href="mijn-planten.html" aria-label="Open Mijn planten"><span class="avatar">JM</span><span class="profile-name">Jamie</span><span class="chevron" aria-hidden="true">⌄</span></a>
+      </div>
+    </header>
+    <main id="plant-main">
+      <a class="plant-back" href="planten.html">← Terug naar alle planten</a>
+      <div id="plant-not-found" class="empty-state" hidden><h1>Plant niet gevonden</h1><p>Deze plant staat niet in onze collectie.</p><a class="primary-button" href="planten.html">Bekijk alle planten</a></div>
+      <div id="plant-page" hidden>
+        <section class="plant-detail-intro" aria-labelledby="plant-title">
+          <div class="plant-detail-photo"><img id="plant-image" alt="" /><a id="plant-image-source" class="image-credit" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
+          <div>
+            <p class="eyebrow" id="plant-category"></p><h1 id="plant-title"></h1><p class="scientific-name" id="plant-scientific"></p>
+            <p id="plant-description"></p>
+            <button type="button" class="primary-button" id="add-plant" disabled>Aan Mijn planten toevoegen</button>
+            <p id="save-hint">Je kunt ook zonder account je plant bijhouden op deze browser.</p>
+          </div>
+        </section>
+        <section class="plant-detail-panel" aria-labelledby="care-title">
+          <p class="eyebrow">Verzorging</p><h2 id="care-title">Zo zorg je voor deze plant</h2>
+          <div class="detail-facts"><p><strong>Licht</strong><span id="plant-light"></span></p><p><strong>Controleer de aarde</strong><span id="plant-interval"></span></p><p><strong>Moeilijkheid</strong><span id="plant-difficulty"></span></p></div>
+          <p><strong>Water:</strong> <span id="plant-water"></span> De waterbehoefte hangt ook af van het seizoen en de standplaats; voorkom dat de wortels langdurig in water staan.</p>
+          <a class="text-link" href="kalender.html">Bekijk de verzorgingskalender →</a>
+        </section>
+        <p id="plant-status" class="plant-status" role="status" aria-live="polite">Je gegevens worden geladen…</p>
+        <div id="personal-section" hidden>
+          <section class="plant-detail-panel" aria-labelledby="profile-title">
+            <p class="eyebrow">Mijn plant</p><h2 id="profile-title">Gegevens van jouw plant</h2>
+            <p>Vul in wat je wilt onthouden. Alle velden zijn optioneel.</p>
+            <img id="personal-photo-preview" class="personal-photo-preview" alt="Je eigen foto van deze plant" hidden />
+            <form id="detail-profile-form" class="detail-form">
+              <fieldset id="profile-fields" disabled>
+                <div class="detail-form-grid">
+                  <label>Eigen naam<input id="detail-name" maxlength="40" placeholder="Bijvoorbeeld Monty" /></label>
+                  <label>Standplaats<input id="detail-location" maxlength="60" placeholder="Bijvoorbeeld woonkamer" /></label>
+                  <label>Plant- of aankoopdatum<input id="detail-date" type="date" /></label>
+                  <label>Eigen foto <small>Maximaal 500 KB</small><input id="detail-photo" type="file" accept="image/*" /></label>
+                </div>
+                <label>Notities<textarea id="detail-notes" maxlength="240" rows="3" placeholder="Bijvoorbeeld: staat bij het raam"></textarea></label>
+                <label class="detail-checkbox"><input id="detail-favorite" type="checkbox" /> Favoriet</label>
+                <label class="detail-checkbox" id="remove-photo-label" hidden><input id="remove-photo" type="checkbox" /> Eigen foto verwijderen</label>
+                <button class="primary-button" type="submit">Plantgegevens opslaan</button>
+              </fieldset>
+            </form>
+          </section>
+          <section class="plant-detail-panel" aria-labelledby="log-title">
+            <p class="eyebrow">Verzorgingslogboek</p><h2 id="log-title">Wat heb je gedaan?</h2>
+            <p>Schrijf op wanneer je voor je plant hebt gezorgd. Je kunt later terugzien wat je hebt gedaan.</p>
+            <form id="care-log-form" class="detail-form">
+              <fieldset id="log-fields" disabled>
+                <div class="detail-form-grid">
+                  <label>Datum<input id="log-date" type="date" required /></label>
+                  <label>Wat heb je gedaan?<select id="log-action" required><option value="">Kies een handeling</option><option>Water gegeven</option><option>Aarde gecontroleerd</option><option>Voeding gegeven</option><option>Verpot</option><option>Gesnoeid</option><option>Anders</option></select></label>
+                </div>
+                <label>Notitie (optioneel)<textarea id="log-notes" maxlength="240" rows="2" placeholder="Bijvoorbeeld: de aarde was nog vochtig"></textarea></label>
+                <button class="primary-button" type="submit">Toevoegen aan logboek</button>
+              </fieldset>
+            </form>
+            <h3>Eerdere verzorging</h3><div id="care-log-list"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="site-footer"><span>© <span id="plant-year"></span> Sproutly · <a href="index.html#privacy">Privacy</a></span><span>Gemaakt voor nieuwsgierige kwekers <span aria-hidden="true">♡</span></span></footer>
+  </div>
+  <script src="plantencollectie.js"></script>
+  <script src="plant.js"></script>
+</body>
+</html>

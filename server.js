@@ -145,7 +145,18 @@ function sanitizeState(input) {
         date: typeof profile.date === "string" ? profile.date.slice(0, 10) : "",
         notes: typeof profile.notes === "string" ? profile.notes.slice(0, 240) : "",
         favorite: profile.favorite === true,
-        photo: typeof profile.photo === "string" && profile.photo.length < 700000 ? profile.photo : ""
+        photo: typeof profile.photo === "string" && profile.photo.length < 700000 ? profile.photo : "",
+        careLog: Array.isArray(profile.careLog) ? profile.careLog
+          .filter((entry) => entry && typeof entry === "object" && typeof entry.id === "string"
+            && typeof entry.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(entry.date)
+            && typeof entry.action === "string" && entry.action.trim())
+          .slice(0, 200)
+          .map((entry) => ({
+            id: entry.id.slice(0, 80),
+            date: entry.date,
+            action: entry.action.trim().slice(0, 60),
+            notes: typeof entry.notes === "string" ? entry.notes.slice(0, 240) : ""
+          })) : []
       };
     }
   }
