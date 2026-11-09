@@ -588,6 +588,57 @@ h1 em, h2 em, h2 span { color: #a44f35; }
   .newsletter-card { background-size: 80px auto; }
   .newsletter-card .outline-button { display: inline-flex; white-space: normal; text-align: center; }
 }
+
+/* Keep content separate from decorative images and allow long labels to wrap. */
+h1, h2, h3, .collection-item, .calendar-event, .care-task { overflow-wrap: anywhere; }
+.plant-tag { background: #fffdf8; }
+.save-plant { background: #fffdf8; }
+.save-plant.saved { background: var(--green); }
+.calendar-day-card { background: #fffdf8; }
+.plant-detail-panel { background: #fffdf8; }
+.plant-care-panel { background: linear-gradient(145deg, #fffdf8 65%, #f1f6e8); }
+.newsletter-card { background: linear-gradient(120deg, #f4ddcb, #f8ebd8); }
+.tour-card { background: linear-gradient(135deg, #fffdf8, #f1f7e9); }
+.tour-card h2 { padding-right: 0; }
+.task-card { grid-template-columns: 47px minmax(0, 1fr) 36px; gap: 8px; }
+.collection-item { grid-template-columns: 39px minmax(0, 1fr) auto; }
+.search-form input, .catalog-search input, .detail-form fieldset { min-width: 0; }
+.detail-form input[type="file"] { max-width: 100%; }
+.calendar-event-actions { flex-wrap: wrap; }
+.toast { max-width: calc(100% - 44px); overflow-wrap: anywhere; }
+
+@media (max-width: 1000px) {
+  .main-nav { gap: 14px; font-size: 14px; }
+  .profile-name, .chevron { display: none; }
+}
+@media (max-width: 850px) {
+  .hero { display: flex; gap: 24px; align-items: center; }
+  .hero-copy { flex: 1 1 0; width: auto; min-width: 0; }
+  .hero-art { position: static; flex: 0 1 260px; width: 35%; height: auto; opacity: 1; }
+  .hero-art > :not(.hero-photo) { display: none; }
+  .hero-photo { position: static; display: block; width: 100%; height: auto; aspect-ratio: 1; transform: none; }
+}
+@media (max-width: 720px) {
+  .site-header { height: auto; min-height: 76px; flex-wrap: wrap; gap: 8px; padding: 16px 0; }
+  .header-actions { margin-left: auto; }
+  .main-nav { display: flex; order: 3; width: 100%; gap: 4px 18px; flex-wrap: wrap; }
+  .main-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .catalog-intro, .page-intro { background: none; }
+}
+@media (max-width: 590px) {
+  .hero { min-height: 0; flex-direction: column; align-items: stretch; gap: 26px; }
+  .hero-copy { width: 100%; }
+  .hero-art { flex: none; width: min(230px, 100%); align-self: center; }
+  .hero-description { max-width: 100%; }
+  .collection-item { grid-template-columns: 34px minmax(0, 1fr); }
+  .plant-info-grid { grid-template-columns: 1fr; }
+  #cancel-profile { margin: 8px 0 0; }
+}
+@media (max-width: 400px) {
+  .search-form { flex-wrap: wrap; padding: 8px; }
+  .search-form input { flex: 1 1 calc(100% - 45px); width: auto; }
+  .search-form button { flex: 1 0 100%; margin-top: 4px; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .plant-card, .plant-photo { transition: none; }
