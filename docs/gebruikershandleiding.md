@@ -16,6 +16,8 @@ In **Mijn planten** kun je met **Alleen mijn favorieten tonen** de lijst filtere
 
 ## Verzorging bijhouden
 
+Op de pagina van een opgeslagen plant kun je onder **Eerdere verzorging** een regel kiezen met **Bewerken**. Pas de datum, handeling of notitie aan en kies **Wijzigingen opslaan**. Met **Annuleren** stop je zonder op te slaan. De kalender berekent het volgende moment opnieuw.
+
 In **Mijn planten** staan de opgeslagen planten en hun actuele status. In het verzorgingsoverzicht zie je taken voor vandaag. Klik op een taak om deze af te vinken of opnieuw open te zetten.
 
 De maandkalender toont geplande water-, bemestings- en verpotmomenten. Open een dag om een taak af te vinken of één dag/één week uit te stellen.

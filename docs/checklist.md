@@ -70,7 +70,7 @@
 - [x] Een account toevoegen wanneer gegevens op meerdere apparaten beschikbaar moeten zijn. Supabase bewaart accountgegevens en plantstatus; lokale opslag blijft beschikbaar zonder account.
 - [x] Favorieten kunnen filteren in Mijn planten en het filter eenvoudig uitschakelen.
 - [ ] Een verwijderde plant met profiel, foto, logboek en bijbehorende verzorgingsgegevens kunnen herstellen via ongedaan maken of een tijdelijke prullenbak; communiceer het herstelvenster als er een tijdslimiet geldt.
-- [ ] Een bestaande verzorgingslogboekregel kunnen wijzigen, inclusief datum, handeling en notitie; de planning opnieuw berekenen na opslaan.
+- [x] Een bestaande verzorgingslogboekregel kunnen wijzigen, inclusief datum, handeling en notitie; de planning opnieuw berekenen na opslaan.
 
 ## 6. Verzorgingskalender en herinneringen
 

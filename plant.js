@@ -11,6 +11,9 @@ const editProfile = document.querySelector("#edit-profile");
 const cancelProfile = document.querySelector("#cancel-profile");
 const logForm = document.querySelector("#care-log-form");
 const logList = document.querySelector("#care-log-list");
+const logSubmit = document.querySelector("#log-submit");
+const cancelLogEdit = document.querySelector("#cancel-log-edit");
+const logEditStatus = document.querySelector("#log-edit-status");
 const plantPicker = document.querySelector("#plant-instance-picker");
 const plantSelect = document.querySelector("#plant-instance");
 const skipLink = document.querySelector(".skip-link");
@@ -38,6 +41,7 @@ let ready = false;
 let busy = false;
 let profileDirty = false;
 let logDirty = false;
+let editingLogId = null;
 let editingProfile = false;
 
 const descriptions = {
@@ -135,12 +139,31 @@ function renderLog() {
     date.textContent = `${day}-${month}-${year}`;
     const notes = document.createElement("p");
     notes.textContent = entry.notes;
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "text-button";
+    edit.textContent = "Bewerken";
+    edit.setAttribute("aria-label", `Bewerk ${entry.action} van ${date.textContent} in het logboek`);
+    edit.disabled = busy || !ready || editingLogId !== null;
+    edit.addEventListener("click", () => {
+      if (logDirty && !window.confirm("Je hebt een niet-opgeslagen verzorgingsmoment. Wil je dit vervangen door de gekozen regel?")) return;
+      editingLogId = entry.id;
+      fields.logDate.value = entry.date;
+      fields.action.value = entry.action;
+      fields.logNotes.value = entry.notes || "";
+      logDirty = false;
+      logSubmit.textContent = "Wijzigingen opslaan";
+      cancelLogEdit.hidden = false;
+      logEditStatus.hidden = false;
+      renderLog();
+      fields.logDate.focus();
+    });
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "text-button";
     remove.textContent = "Verwijderen";
     remove.setAttribute("aria-label", `Verwijder ${entry.action} van ${date.textContent} uit het logboek`);
-    remove.disabled = busy || !ready;
+    remove.disabled = busy || !ready || editingLogId !== null;
     remove.addEventListener("click", async () => {
       const previousState = JSON.parse(JSON.stringify(state));
       const profile = state.plantProfiles[selectedId];
@@ -149,9 +172,20 @@ function renderLog() {
     });
     row.append(title, date);
     if (entry.notes) row.append(notes);
-    row.append(remove);
+    row.append(edit, remove);
     logList.append(row);
   });
+}
+
+function resetLogForm() {
+  editingLogId = null;
+  fields.logDate.value = localDate();
+  fields.action.value = "";
+  fields.logNotes.value = "";
+  logDirty = false;
+  logSubmit.textContent = "Toevoegen aan logboek";
+  cancelLogEdit.hidden = true;
+  logEditStatus.hidden = true;
 }
 
 function renderProfile() {
@@ -303,6 +337,13 @@ if (!plant) {
   });
   logForm.addEventListener("input", () => { logDirty = true; });
   logForm.addEventListener("change", () => { logDirty = true; });
+  cancelLogEdit.addEventListener("click", () => {
+    if (busy) return;
+    if (logDirty && !window.confirm("Je hebt niet-opgeslagen wijzigingen. Wil je stoppen met bewerken?")) return;
+    resetLogForm();
+    renderLog();
+    fields.action.focus();
+  });
   plantSelect.addEventListener("change", () => {
     if (!plantSelect.value) {
       plantSelect.value = selectedId || "";
@@ -326,10 +367,8 @@ if (!plant) {
       history.replaceState(null, "", new URL(window.SproutlyPlants.url(plant.name, selectedId), document.baseURI).href);
       updateSkipLink();
       fields.photo.value = "";
-      fields.action.value = "";
-      fields.logNotes.value = "";
+      resetLogForm();
       profileDirty = false;
-      logDirty = false;
       editingProfile = true;
       renderProfile();
       profileForm.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -379,26 +418,36 @@ if (!plant) {
 
   logForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!ready || busy || !selectedId) return;
     if (!window.SproutlyCare.parseDate(fields.logDate.value) || fields.logDate.value > localDate()) {
       setStatus("Kies een geldige datum die niet in de toekomst ligt.");
       return;
     }
+    if (!["Water gegeven", "Aarde gecontroleerd", "Voeding gegeven", "Verpot", "Gesnoeid", "Anders"].includes(fields.action.value)) {
+      setStatus("Kies een geldige handeling.");
+      return;
+    }
     const profile = state.plantProfiles[selectedId] || {};
     const entries = profile.careLog || [];
-    if (entries.length >= 200) {
+    if (editingLogId === null && entries.length >= 200) {
       setStatus("Je logboek is vol. Verwijder eerst een oud verzorgingsmoment.");
       return;
     }
+    if (editingLogId !== null && !entries.some((entry) => entry.id === editingLogId)) {
+      setStatus("Dit verzorgingsmoment is niet meer beschikbaar. Vernieuw de pagina en probeer opnieuw.");
+      return;
+    }
     const previousState = JSON.parse(JSON.stringify(state));
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const editing = editingLogId !== null;
+    const id = editing ? editingLogId : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const updatedEntry = { id, date: fields.logDate.value, action: fields.action.value, notes: fields.logNotes.value.trim() };
     state.plantProfiles[selectedId] = {
       ...profile,
-      careLog: [{ id, date: fields.logDate.value, action: fields.action.value, notes: fields.logNotes.value.trim() }, ...entries]
+      careLog: editing ? entries.map((entry) => entry.id === id ? { ...entry, ...updatedEntry } : entry) : [updatedEntry, ...entries]
     };
-    if (await save("Het verzorgingsmoment is toegevoegd aan je logboek.", previousState)) {
-      fields.action.value = "";
-      fields.logNotes.value = "";
-      logDirty = false;
+    if (await save(editing ? "Het verzorgingsmoment is aangepast. De planning wordt opnieuw berekend." : "Het verzorgingsmoment is toegevoegd aan je logboek.", previousState)) {
+      resetLogForm();
+      renderLog();
     }
   });
   initialize();

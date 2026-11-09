@@ -266,7 +266,7 @@ De verzorgingskalender bevat naast het weekoverzicht een maandweergave met:
 - Een detailpaneel voor de geselecteerde dag.
 - Een knop om een handeling na bevestiging op vandaag in het logboek vast te leggen.
 
-De maandkalender toont het eerstvolgende moment per plant en handeling, geen volledige reeks vooruit. Een foutieve registratie kan via het logboek worden verwijderd.
+De maandkalender toont het eerstvolgende moment per plant en handeling, geen volledige reeks vooruit. Een foutieve registratie kan via het logboek worden bewerkt of verwijderd; de planning wordt daarna opnieuw berekend.
 
 ### 6.12 Automatische verzorgingsplanning
 
@@ -408,9 +408,8 @@ De eerste versie voldoet wanneer:
 De onderstaande voorstellen zijn **nog niet gerealiseerd**:
 
 1. **Verwijderde plant herstellen:** bied ongedaan maken of een tijdelijke prullenbak. Herstel het specifieke exemplaar met profiel, foto, logboek en bijbehorende planning; communiceer een eventuele bewaartermijn en vraag waar nodig bevestiging.
-2. **Logboekregel bewerken:** laat de gebruiker datum, handeling en notitie van een bestaande regel aanpassen en bevestigen. Valideer de invoer en bereken de planning opnieuw na opslaan.
-3. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
-4. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
+2. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
+3. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
 
 **Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
 

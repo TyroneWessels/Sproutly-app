@@ -210,6 +210,7 @@ h2 span { color: #cf7d5f; }
 .detail-form input:not([type="checkbox"]), .detail-form textarea, .detail-form select { width: 100%; min-height: 46px; padding: 10px; border: 1px solid #9aafa0; border-radius: 6px; background: #fff; color: var(--ink); font: inherit; }
 .detail-form textarea { resize: vertical; }
 .detail-form[hidden] { display: none; }
+.detail-form button[hidden] { display: none; }
 .profile-summary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
 .profile-summary-list > div { padding: 14px 16px; border: 1px solid #d5e0d1; border-radius: 14px 14px 14px 4px; background: #f3f8ef; }
 .profile-summary-list dt { font-weight: 800; }

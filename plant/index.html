@@ -105,6 +105,7 @@
           <section class="plant-detail-panel" aria-labelledby="log-title">
             <p class="eyebrow">Verzorgingslogboek</p><h2 id="log-title">Wat heb je gedaan?</h2>
             <p>Schrijf op wanneer je voor je plant hebt gezorgd. De kalender berekent het volgende moment vanaf de laatst geregistreerde datum.</p>
+            <p id="log-edit-status" role="status" hidden>Je bewerkt een eerder verzorgingsmoment.</p>
             <form id="care-log-form" class="detail-form">
               <fieldset id="log-fields" disabled>
                 <div class="detail-form-grid">
@@ -112,7 +113,8 @@
                   <label>Wat heb je gedaan?<select id="log-action" required><option value="">Kies een handeling</option><option>Water gegeven</option><option>Aarde gecontroleerd</option><option>Voeding gegeven</option><option>Verpot</option><option>Gesnoeid</option><option>Anders</option></select></label>
                 </div>
                 <label>Notitie (optioneel)<textarea id="log-notes" maxlength="240" rows="2" placeholder="Bijvoorbeeld: de aarde was nog vochtig"></textarea></label>
-                <button class="primary-button" type="submit">Toevoegen aan logboek</button>
+                <button class="primary-button" id="log-submit" type="submit">Toevoegen aan logboek</button>
+                <button class="outline-button" id="cancel-log-edit" type="button" hidden>Annuleren</button>
               </fieldset>
             </form>
             <h3>Eerdere verzorging</h3><div id="care-log-list"></div>

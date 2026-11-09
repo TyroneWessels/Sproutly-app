@@ -15,8 +15,8 @@ async function loadPage(account, storedPlants, storedProfiles) {
     if (!elements.has(selector)) {
       elements.set(selector, {
         hidden: false, disabled: ["#add-plant", "#profile-fields", "#log-fields"].includes(selector), value: "", checked: false, textContent: "", files: [],
-        handlers: {}, addEventListener(type, handler) { this.handlers[type] = handler; },
-        replaceChildren() {}, append() {}, removeAttribute() {}, setAttribute() {}, scrollIntoView() {}, focus() {}
+        handlers: {}, children: [], addEventListener(type, handler) { this.handlers[type] = handler; },
+        replaceChildren() { this.children = []; }, append(...items) { this.children.push(...items); }, removeAttribute() {}, setAttribute() {}, scrollIntoView() {}, focus() {}
       });
     }
     return elements.get(selector);
@@ -29,7 +29,7 @@ async function loadPage(account, storedPlants, storedProfiles) {
   const context = {
     document, location: { search: "?naam=Monstera" }, history: { replaceState() {} },
     URL, URLSearchParams, Date, JSON, Object, Array, String, Uint8Array, crypto: webcrypto,
-    window: { SPROUTLY_PLANTS: [plant], SPROUTLY_DEFAULT_SAVED_PLANTS: [], handlePlantImageError() {}, SproutlyAccount: account },
+    window: { SPROUTLY_PLANTS: [plant], SPROUTLY_DEFAULT_SAVED_PLANTS: [], handlePlantImageError() {}, SproutlyAccount: account, confirm: () => true },
     localStorage: {
       getItem: (key) => storage.has(key) ? storage.get(key) : null,
       setItem: (key, value) => storage.set(key, value)
@@ -40,7 +40,7 @@ async function loadPage(account, storedPlants, storedProfiles) {
   vm.runInNewContext(care, context);
   vm.runInNewContext(source, context);
   await new Promise((resolve) => setImmediate(resolve));
-  return { element, storage };
+  return { element, storage, care: context.window.SproutlyCare };
 }
 
 test("signed-out visitor can save plants locally", async () => {
@@ -115,4 +115,53 @@ test("failed addition preserves the current unsaved profile form", async () => {
   assert.equal(element("#detail-profile-form").hidden, false);
   assert.equal(element("#detail-name").value, "Nog niet opgeslagen");
   assert.match(element("#plant-status").textContent, /offline/);
+});
+
+test("editing a log entry preserves its identity and recalculates the schedule", async () => {
+  const profiles = { Monstera: { careLog: [
+    { id: "one", date: "2020-01-01", action: "Water gegeven", notes: "Oud" },
+    { id: "two", date: "2020-01-02", action: "Gesnoeid", notes: "" }
+  ] } };
+  const { element, storage, care } = await loadPage({ getUser: async () => null }, '["Monstera"]', JSON.stringify(profiles));
+  const rows = element("#care-log-list").children;
+  const edit = rows[1].children.find((child) => child.textContent === "Bewerken");
+  edit.handlers.click();
+  assert.equal(element("#log-date").value, "2020-01-01");
+  assert.equal(element("#log-submit").textContent, "Wijzigingen opslaan");
+  element("#log-date").value = "2020-01-05";
+  element("#log-action").value = "Aarde gecontroleerd";
+  element("#log-notes").value = "  Nieuwe notitie  ";
+  await element("#care-log-form").handlers.submit({ preventDefault() {} });
+  const saved = JSON.parse(storage.get("sproutly-profiles")).Monstera.careLog;
+  assert.deepEqual(saved[0], { id: "one", date: "2020-01-05", action: "Aarde gecontroleerd", notes: "Nieuwe notitie" });
+  assert.equal(saved[1].id, "two");
+  assert.equal(care.events(["Monstera"], { Monstera: { careLog: saved } }, {}, new Date(2020, 0, 6))[0].dueDate, "2020-01-12");
+  assert.equal(element("#cancel-log-edit").hidden, true);
+});
+
+test("failed account edit keeps entered values and leaves the original entry intact", async () => {
+  const state = { savedPlants: ["Monstera"], plantProfiles: { Monstera: { careLog: [{ id: "one", date: "2020-01-01", action: "Water gegeven", notes: "Oud" }] } }, completedTasks: [], careOverrides: {} };
+  const account = { getUser: async () => ({ id: "user" }), getState: async () => structuredClone(state), saveState: async () => { throw new Error("offline"); } };
+  const { element } = await loadPage(account);
+  element("#care-log-list").children[0].children.find((child) => child.textContent === "Bewerken").handlers.click();
+  element("#log-notes").value = "Niet verliezen";
+  await element("#care-log-form").handlers.submit({ preventDefault() {} });
+  assert.equal(element("#log-notes").value, "Niet verliezen");
+  assert.equal(element("#cancel-log-edit").hidden, false);
+  assert.match(element("#plant-status").textContent, /offline/);
+  assert.equal(element("#care-log-list").children[0].children.find((child) => child.textContent === "Oud").textContent, "Oud");
+});
+
+test("editing rejects future dates and invalid actions without saving", async () => {
+  const profiles = { Monstera: { careLog: [{ id: "one", date: "2020-01-01", action: "Water gegeven", notes: "" }] } };
+  const { element, storage } = await loadPage({ getUser: async () => null }, '["Monstera"]', JSON.stringify(profiles));
+  element("#care-log-list").children[0].children.find((child) => child.textContent === "Bewerken").handlers.click();
+  element("#log-date").value = "9999-12-31";
+  await element("#care-log-form").handlers.submit({ preventDefault() {} });
+  assert.match(element("#plant-status").textContent, /toekomst/);
+  element("#log-date").value = "2020-01-01";
+  element("#log-action").value = "Ongeldig";
+  await element("#care-log-form").handlers.submit({ preventDefault() {} });
+  assert.match(element("#plant-status").textContent, /geldige handeling/);
+  assert.equal(storage.get("sproutly-profiles"), JSON.stringify(profiles));
 });
