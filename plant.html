@@ -73,9 +73,19 @@
         <div id="personal-section" hidden>
           <section class="plant-detail-panel" aria-labelledby="profile-title">
             <p class="eyebrow">Mijn plant</p><h2 id="profile-title">Gegevens van jouw plant</h2>
-            <p>Vul in wat je wilt onthouden. Alle velden zijn optioneel.</p>
+            <p id="profile-help">Bekijk de gegevens die je over deze plant hebt bewaard.</p>
             <img id="personal-photo-preview" class="personal-photo-preview" alt="Je eigen foto van deze plant" hidden />
-            <form id="detail-profile-form" class="detail-form">
+            <div id="profile-summary">
+              <dl class="profile-summary-list">
+                <div><dt>Eigen naam</dt><dd id="summary-name"></dd></div>
+                <div><dt>Standplaats</dt><dd id="summary-location"></dd></div>
+                <div><dt>Plant- of aankoopdatum</dt><dd id="summary-date"></dd></div>
+                <div><dt>Favoriet</dt><dd id="summary-favorite"></dd></div>
+                <div class="profile-summary-notes"><dt>Notities</dt><dd id="summary-notes"></dd></div>
+              </dl>
+              <button class="primary-button" id="edit-profile" type="button">Plantgegevens bewerken</button>
+            </div>
+            <form id="detail-profile-form" class="detail-form" hidden>
               <fieldset id="profile-fields" disabled>
                 <div class="detail-form-grid">
                   <label>Eigen naam<input id="detail-name" maxlength="40" placeholder="Bijvoorbeeld Monty" /></label>
@@ -87,6 +97,7 @@
                 <label class="detail-checkbox"><input id="detail-favorite" type="checkbox" /> Favoriet</label>
                 <label class="detail-checkbox" id="remove-photo-label" hidden><input id="remove-photo" type="checkbox" /> Eigen foto verwijderen</label>
                 <button class="primary-button" type="submit">Plantgegevens opslaan</button>
+                <button class="outline-button" id="cancel-profile" type="button">Annuleren</button>
               </fieldset>
             </form>
           </section>

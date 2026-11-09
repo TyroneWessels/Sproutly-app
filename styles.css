@@ -210,6 +210,13 @@ h2 span { color: #cf7d5f; }
 .detail-form label small { color: var(--muted); font-weight: 400; }
 .detail-form input:not([type="checkbox"]), .detail-form textarea, .detail-form select { width: 100%; min-height: 46px; padding: 10px; border: 1px solid #9aafa0; border-radius: 6px; background: #fff; color: var(--ink); font: inherit; }
 .detail-form textarea { resize: vertical; }
+.detail-form[hidden] { display: none; }
+.profile-summary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.profile-summary-list > div { padding: 14px 16px; border: 1px solid #d5e0d1; border-radius: 14px 14px 14px 4px; background: #f3f8ef; }
+.profile-summary-list dt { font-weight: 800; }
+.profile-summary-list dd { margin: 4px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.profile-summary-notes { grid-column: 1 / -1; }
+#cancel-profile { margin-left: 8px; }
 .detail-form .detail-checkbox { display: flex; align-items: center; gap: 8px; }
 .detail-form .detail-checkbox[hidden] { display: none; }
 .detail-checkbox input { width: 20px; height: 20px; }
@@ -220,6 +227,7 @@ h2 span { color: #cf7d5f; }
 .care-log-entry button { justify-self: start; min-height: 40px; font-size: 13px; }
 @media (max-width: 700px) {
   .plant-detail-intro, .detail-facts, .detail-form-grid { grid-template-columns: 1fr; }
+  .profile-summary-list { grid-template-columns: 1fr; }
   .plant-detail-intro { gap: 20px; }
   .plant-detail-panel { padding: 20px; }
 }

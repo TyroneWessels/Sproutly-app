@@ -6,6 +6,9 @@ const profileFields = document.querySelector("#profile-fields");
 const logFields = document.querySelector("#log-fields");
 const personalSection = document.querySelector("#personal-section");
 const profileForm = document.querySelector("#detail-profile-form");
+const profileSummary = document.querySelector("#profile-summary");
+const editProfile = document.querySelector("#edit-profile");
+const cancelProfile = document.querySelector("#cancel-profile");
 const logForm = document.querySelector("#care-log-form");
 const logList = document.querySelector("#care-log-list");
 const plantPicker = document.querySelector("#plant-instance-picker");
@@ -30,6 +33,7 @@ let ready = false;
 let busy = false;
 let profileDirty = false;
 let logDirty = false;
+let editingProfile = false;
 
 const descriptions = {
   "Monstera": "De monstera, ook wel gatenplant genoemd, is een kamerplant met grote bladeren waarin op latere leeftijd gaten kunnen ontstaan.",
@@ -100,6 +104,8 @@ function updateControls() {
   addButton.textContent = saved ? "Nog een plant toevoegen" : "Een plant toevoegen";
   personalSection.hidden = !saved;
   profileFields.disabled = !ready || busy;
+  editProfile.disabled = !ready || busy;
+  cancelProfile.disabled = !ready || busy;
   logFields.disabled = !ready || busy;
   document.querySelector("#nav-count").textContent = String(state ? state.savedPlants.length : 0);
 }
@@ -146,11 +152,23 @@ function renderLog() {
 function renderProfile() {
   const profile = state.plantProfiles[selectedId] || {};
   document.querySelector("#profile-title").textContent = `Gegevens van ${selectedId ? window.SproutlyPlants.label(selectedId, state.savedPlants, state.plantProfiles) : plant.name}`;
-  fields.name.value = profile.customName || "";
-  fields.location.value = profile.location || "";
-  fields.date.value = profile.date || "";
-  fields.notes.value = profile.notes || "";
-  fields.favorite.checked = Boolean(profile.favorite);
+  const date = window.SproutlyCare.parseDate(profile.date);
+  document.querySelector("#summary-name").textContent = profile.customName || "Niet ingevuld";
+  document.querySelector("#summary-location").textContent = profile.location || "Niet ingevuld";
+  document.querySelector("#summary-date").textContent = date ? date.toLocaleDateString("nl-NL") : "Niet ingevuld";
+  document.querySelector("#summary-notes").textContent = profile.notes || "Niet ingevuld";
+  document.querySelector("#summary-favorite").textContent = profile.favorite ? "Ja" : "Nee";
+  profileSummary.hidden = editingProfile;
+  profileForm.hidden = !editingProfile;
+  document.querySelector("#profile-help").textContent = editingProfile
+    ? "Vul in wat je wilt onthouden. Alle velden zijn optioneel."
+    : "Bekijk de gegevens die je over deze plant hebt bewaard.";
+  fields.name.value = editingProfile ? profile.customName || "" : "";
+  fields.location.value = editingProfile ? profile.location || "" : "";
+  fields.date.value = editingProfile ? profile.date || "" : "";
+  fields.notes.value = editingProfile ? profile.notes || "" : "";
+  fields.favorite.checked = editingProfile && Boolean(profile.favorite);
+  fields.photo.value = "";
   const preview = document.querySelector("#personal-photo-preview");
   preview.hidden = !profile.photo;
   if (profile.photo) preview.src = profile.photo;
@@ -264,6 +282,20 @@ if (!plant) {
 
   profileForm.addEventListener("input", () => { profileDirty = true; });
   profileForm.addEventListener("change", () => { profileDirty = true; });
+  editProfile.addEventListener("click", () => {
+    if (!ready || busy) return;
+    editingProfile = true;
+    renderProfile();
+    fields.name.focus();
+  });
+  cancelProfile.addEventListener("click", () => {
+    if (busy) return;
+    if (profileDirty && !window.confirm("Je hebt niet-opgeslagen wijzigingen. Wil je stoppen met bewerken?")) return;
+    profileDirty = false;
+    editingProfile = false;
+    renderProfile();
+    editProfile.focus();
+  });
   logForm.addEventListener("input", () => { logDirty = true; });
   logForm.addEventListener("change", () => { logDirty = true; });
   plantSelect.addEventListener("change", () => {
@@ -292,11 +324,13 @@ if (!plant) {
       fields.logNotes.value = "";
       profileDirty = false;
       logDirty = false;
+      editingProfile = true;
       renderProfile();
       profileForm.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
       selectedId = previousId;
-      renderProfile();
+      updateControls();
+      renderLog();
     }
   });
 
@@ -331,7 +365,9 @@ if (!plant) {
     if (await save("Je plantgegevens zijn opgeslagen.", previousState)) {
       fields.photo.value = "";
       profileDirty = false;
+      editingProfile = false;
       renderProfile();
+      editProfile.focus();
     }
   });
 
