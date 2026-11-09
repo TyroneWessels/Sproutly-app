@@ -12,6 +12,11 @@ let catalogFilter = "all";
 let savedPlants = new Set(JSON.parse(localStorage.getItem("sproutly-plants") || "[]"));
 let currentUser = null;
 let backendAvailable = false;
+const navCount = document.querySelector("#nav-count");
+
+function updateNavCount() {
+  if (navCount) navCount.textContent = String(savedPlants.size);
+}
 
 function escapeCatalogHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
@@ -61,6 +66,7 @@ async function initializeCatalogSession() {
       const stateResponse = await fetch("/api/me/state", { credentials: "same-origin" });
       const state = await stateResponse.json();
       savedPlants = new Set(Array.isArray(state.savedPlants) ? state.savedPlants : []);
+      updateNavCount();
       renderCatalog();
     }
   } catch (error) {
@@ -84,6 +90,7 @@ function renderCatalog() {
   });
   catalogResultCount.textContent = `${sorted.length} ${sorted.length === 1 ? "plant" : "planten"} gevonden`;
   catalogEmpty.hidden = sorted.length > 0;
+  updateNavCount();
   catalogGrid.innerHTML = sorted.map((plant) => `
     <article class="plant-card catalog-card">
       <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" type="button" data-catalog-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Voeg toe"} ${plant.name}">
