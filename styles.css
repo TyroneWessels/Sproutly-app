@@ -144,6 +144,16 @@ h2 span { color: #cf7d5f; }
 .save-plant.saved { background: var(--green); color: #fff; }
 .empty-state { padding: 30px; border: 1px dashed #b6c8bc; border-radius: 9px; text-align: center; color: var(--muted); }
 .catalog-intro { max-width: 700px; padding: 70px 0 42px; }
+.page-intro { max-width: 700px; padding: 70px 0 42px; }
+.page-intro h1 { font-size: clamp(48px, 6vw, 72px); }
+.page-intro > p:not(.eyebrow) { max-width: 520px; margin: 22px 0 0; color: var(--muted); line-height: 1.65; }
+.saved-plants-panel { padding: 30px 0 0; }
+.page-callout { margin-top: 84px; }
+.calendar-event { margin: 18px 0 0; padding: 14px; border-radius: 7px; background: var(--light-green); color: var(--ink); font-size: 13px; line-height: 1.5; }
+.calendar-event.muted { background: var(--cream); color: var(--muted); }
+.calendar-day.empty { pointer-events: none; }
+.calendar-day.has-event { cursor: pointer; }
+.calendar-dot { position: absolute; right: 7px; bottom: 7px; width: 7px; height: 7px; border-radius: 50%; background: #d68e67; }
 .catalog-intro h1 { font-size: clamp(48px, 6vw, 72px); }
 .catalog-intro > p:not(.eyebrow) { max-width: 520px; margin: 22px 0 0; color: var(--muted); line-height: 1.65; }
 .catalog-controls { margin-bottom: 30px; padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
@@ -154,6 +164,9 @@ h2 span { color: #cf7d5f; }
 .catalog-card { min-height: 310px; padding-bottom: 19px; }
 .catalog-card .save-plant { width: auto; height: auto; padding: 7px 10px; border-radius: 16px; font-size: 10px; font-weight: 700; }
 .catalog-card-meta { margin: 8px 0 0; color: var(--muted); font-size: 10px; }
+.plant-card-links { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 10px; }
+.image-credit { display: inline-block; color: var(--muted); font-size: 10px; text-decoration: underline; text-underline-offset: 2px; }
+.image-credit:hover { color: var(--green); }
 .catalog-account-link { font-size: 12px; font-weight: 700; color: var(--green); }
 .my-plants-section { display: grid; grid-template-columns: .9fr 1.1fr; gap: 90px; align-items: center; margin: 112px -42px 0; padding: 75px 11%; background: #e9f0e2; }
 .my-plants-copy h2 { margin-bottom: 18px; font-size: 46px; }
@@ -190,11 +203,14 @@ h2 span { color: #cf7d5f; }
 .care-task small { color: var(--muted); font-size: 9px; line-height: 1.3; }
 .care-empty { margin: 20px 0 0; color: var(--muted); font-size: 11px; }
 .week-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; padding: 7px 0 19px; border-bottom: 1px solid var(--line); }
-.week-days > div { display: grid; justify-items: center; gap: 8px; color: var(--muted); }
+.week-day { display: grid; justify-items: center; gap: 8px; padding: 5px 0; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; cursor: pointer; }
+.week-day:hover { background: var(--cream); }
+.week-day:focus-visible { outline: 2px solid #c47b58; outline-offset: 2px; }
 .week-days small { font-size: 9px; }
-.week-days .active small { color: var(--green); font-weight: 700; }
+.week-day.active small { color: var(--green); font-weight: 700; }
 .week-dot { width: 8px; height: 8px; border: 1px solid #a9c5ae; border-radius: 50%; }
-.week-days .active .week-dot { border-color: var(--green); background: var(--green); box-shadow: 0 0 0 4px var(--light-green); }
+.week-day.has-events .week-dot { border-color: #d68e67; background: #d68e67; }
+.week-day.active .week-dot { border-color: var(--green); background: var(--green); box-shadow: 0 0 0 4px var(--light-green); }
 .week-highlight { display: flex; align-items: center; gap: 11px; margin-top: 17px; }
 .week-highlight > span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #f6e8b6; color: #a77c37; }
 .week-highlight p { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.5; }

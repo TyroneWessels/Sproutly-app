@@ -1,13 +1,4 @@
-const catalogPlants = [
-  { name: "Monstera", aliases: ["gatenplant"], scientific: "Monstera deliciosa", category: "Binnenplant", filter: "indoor", art: "art-monstera", image: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=85", light: "Indirect licht", lightLevel: "medium", difficulty: "easy", type: "Kamerplant" },
-  { name: "Basilicum", aliases: ["basil"], scientific: "Ocimum basilicum", category: "Kruid", filter: "indoor", art: "art-herb", image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?auto=format&fit=crop&w=800&q=85", light: "Veel licht", lightLevel: "high", difficulty: "easy", type: "Kruid" },
-  { name: "Lavendel", aliases: ["lavender"], scientific: "Lavandula angustifolia", category: "Buitenplant", filter: "outdoor", art: "art-lavender", image: "https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&fit=crop&w=800&q=85", light: "Veel licht", lightLevel: "high", difficulty: "easy", type: "Buitenplant" },
-  { name: "Sansevieria", aliases: ["vrouwentong", "snake plant"], scientific: "Dracaena trifasciata", category: "Binnenplant", filter: "indoor", art: "art-snake", image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=85", light: "Weinig licht", lightLevel: "low", difficulty: "easy", type: "Kamerplant" },
-  { name: "Aloë vera", aliases: ["aloe", "aloe vera"], scientific: "Aloe barbadensis miller", category: "Binnenplant", filter: "indoor", art: "art-aloe", image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=85", light: "Indirect licht", lightLevel: "medium", difficulty: "easy", type: "Vetplant" },
-  { name: "Tomaat", aliases: ["tomatenplant", "tomato"], scientific: "Solanum lycopersicum", category: "Buitenplant", filter: "outdoor", art: "art-tomato", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=85", light: "Veel licht", lightLevel: "high", difficulty: "medium", type: "Groente" },
-  { name: "Rozemarijn", aliases: ["rosemary"], scientific: "Salvia rosmarinus", category: "Buitenplant", filter: "outdoor", art: "art-rosemary", image: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=800&q=85", light: "Veel licht", lightLevel: "high", difficulty: "easy", type: "Kruid" },
-  { name: "Pannenkoekenplant", aliases: ["pilea", "pilea peperomioides"], scientific: "Pilea peperomioides", category: "Binnenplant", filter: "indoor", art: "art-pilea", image: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=800&q=85", light: "Indirect licht", lightLevel: "medium", difficulty: "easy", type: "Kamerplant" }
-];
+const catalogPlants = window.SPROUTLY_PLANTS;
 
 const catalogGrid = document.querySelector("#catalog-grid");
 const catalogSearch = document.querySelector("#catalog-search");
@@ -29,7 +20,7 @@ function escapeCatalogHtml(value) {
 }
 
 function imageUrl(image, width) {
-  return image.replace(/([?&])w=\d+/, `$1w=${width}`);
+  return image.replace(/\/\d+px-([^/]+)$/, `/${width}px-$1`);
 }
 
 function showCatalogToast(message) {
@@ -109,8 +100,10 @@ function renderCatalog() {
       <h3>${plant.name}</h3>
       <p class="scientific-name">${plant.scientific}</p>
       <p class="catalog-card-meta">${plant.light} · ${plant.difficulty === "easy" ? "Makkelijk" : "Gemiddeld"}</p>
+      <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
   `).join("");
+  catalogGrid.querySelectorAll(".plant-photo").forEach((image) => image.addEventListener("error", window.handlePlantImageError, { once: true }));
 }
 
 document.querySelectorAll("[data-catalog-filter]").forEach((button) => {

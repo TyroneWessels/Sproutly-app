@@ -111,15 +111,17 @@ const sourceDetails = {
 };
 plants.forEach((plant, index) => {
   const source = sourceDetails[plant.sourceUrl];
+  const catalogPlant = window.SPROUTLY_PLANTS.find((item) => item.scientific === plant.scientific);
   plant.id = `plant-${index + 1}`;
-  plant.imageUrl = plant.image;
+  plant.imageUrl = catalogPlant.image;
+  plant.imageSource = catalogPlant.imageSource;
   plant.scientificName = plant.scientific;
   plant.light = plant.facts[0];
   plant.watering = plant.facts[1];
   plant.repotting = plant.facts[2];
   plant.sourceLabel = source.label;
   plant.sourceUrl = source.url;
-  plant.imageLicenseUrl = "https://unsplash.com/license";
+  plant.imageLicenseUrl = catalogPlant.imageSource;
 });
 
 const careSchedules = {
@@ -552,6 +554,7 @@ function renderPlants(query = "") {
       <span class="plant-tag">${plant.category}</span>
       <h3>${plant.name}</h3>
       <p class="scientific-name">${plant.scientific}</p>
+      <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
   `).join("");
   emptyState.hidden = visiblePlants.length > 0;
@@ -607,11 +610,7 @@ async function checkGbifName(query) {
 }
 
 function handleImageError(event) {
-  const image = event.currentTarget;
-  image.onerror = null;
-  image.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'%3E%3Crect width='800' height='600' fill='%23dcebd7'/%3E%3Ctext x='400' y='305' text-anchor='middle' fill='%232f7259' font-family='Arial' font-size='28'%3EGeen foto beschikbaar%3C/text%3E%3C/svg%3E";
-  image.alt = "Afbeelding niet beschikbaar";
-  image.classList.add("image-error");
+  window.handlePlantImageError(event);
 }
 
 function escapeHtml(value) {
@@ -665,10 +664,12 @@ function renderCollection() {
 function renderCarePlan() {
   const today = new Date();
   const dayNames = ["zondag", "maandag", "dinsdag", "woensdag", "donderdag", "vrijdag", "zaterdag"];
+  const shortDayNames = ["ZO", "MA", "DI", "WO", "DO", "VR", "ZA"];
   const monthNames = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
   document.querySelector("#today-label").textContent = `${dayNames[today.getDay()]} ${today.getDate()} ${monthNames[today.getMonth()]}`;
   const todayKey = getDateKey(today);
-  const todayTasks = getCalendarEvents().filter((event) => event.date === todayKey);
+  const events = getCalendarEvents();
+  const todayTasks = events.filter((event) => event.date === todayKey);
   document.querySelector("#today-task-count").textContent = `${todayTasks.length} ${todayTasks.length === 1 ? "taak" : "taken"}`;
   document.querySelector("#today-tasks").innerHTML = todayTasks.length ? todayTasks.map((plant) => {
     return `<button class="care-task ${plant.done ? "complete" : ""}" data-care-task="${plant.taskId}">
@@ -676,6 +677,28 @@ function renderCarePlan() {
       <span><strong>${escapeHtml(plant.plantName)}</strong><small>${escapeHtml(plant.title)}</small></span>
     </button>`;
   }).join("") : `<p class="care-empty">Geen dringende taken. Je planten doen het goed.</p>`;
+  const monday = addDays(today, (today.getDay() + 6) % 7);
+  const weekDates = Array.from({ length: 7 }, (_, index) => addDays(monday, index));
+  const weekDateKeys = new Set(weekDates.map(getDateKey));
+  const weekEvents = events.filter((event) => weekDateKeys.has(event.date));
+  document.querySelector("#week-task-count").textContent = `${weekEvents.length} ${weekEvents.length === 1 ? "moment" : "momenten"}`;
+  const weekDays = document.querySelector("#week-days");
+  weekDays.innerHTML = weekDates.map((date) => {
+    const dateKey = getDateKey(date);
+    const dayEvents = weekEvents.filter((event) => event.date === dateKey);
+    const isToday = dateKey === todayKey;
+    const label = `${dayNames[date.getDay()]} ${date.getDate()} ${monthNames[date.getMonth()]}`;
+    const eventLabel = dayEvents.length ? `, ${dayEvents.length} ${dayEvents.length === 1 ? "verzorgingsmoment" : "verzorgingsmomenten"}` : ", geen verzorgingsmomenten";
+    return `<button class="week-day ${isToday ? "active" : ""} ${dayEvents.length ? "has-events" : ""}" type="button" data-week-date="${dateKey}" aria-label="${label}${eventLabel}" ${isToday ? 'aria-current="date"' : ""}><small>${shortDayNames[date.getDay()]}</small><span class="week-dot" aria-hidden="true"></span></button>`;
+  }).join("");
+  weekDays.querySelectorAll("[data-week-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedCalendarDate = parseDateKey(button.dataset.weekDate);
+      calendarMonth = new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), 1);
+      renderCalendar();
+      document.querySelector("#calendar-view").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
 }
 
 function getDateKey(date) {
@@ -803,7 +826,7 @@ function openPlant(plant) {
     ["Bemesten", plant.fertilizing],
     ["Oogst / bloei", plant.harvest]
   ].map(([label, value]) => `<div class="info-item"><small>${label}</small><strong>${value}</strong></div>`).join("");
-  document.querySelector("#modal-source").innerHTML = `Bron: <a href="${plant.sourceUrl}" target="_blank" rel="noreferrer">${plant.sourceLabel}</a> · gecontroleerd op ${plant.lastVerified} · foto’s: <a href="${plant.imageLicenseUrl}" target="_blank" rel="noreferrer">Unsplash-licentie</a>`;
+  document.querySelector("#modal-source").innerHTML = `Bron: <a href="${plant.sourceUrl}" target="_blank" rel="noreferrer">${plant.sourceLabel}</a> · gecontroleerd op ${plant.lastVerified} · foto: <a href="${plant.imageLicenseUrl}" target="_blank" rel="noreferrer">bron en licentie op Wikimedia Commons</a>`;
   document.querySelector("#modal-next-care").textContent = plant.nextCare;
   profileName.value = profile.customName || "";
   profileLocation.value = profile.location || "";
