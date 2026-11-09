@@ -12,6 +12,7 @@
 
 Klik op het hartje op een plantkaart of open de details en kies **Aan mijn planten toevoegen**.
 In de details van een opgeslagen plant kun je een eigen naam, locatie, datum, foto, notities en favorietstatus bewaren.
+In **Mijn planten** kun je met **Alleen mijn favorieten tonen** de lijst filteren. Schakel het vinkje uit om alle planten weer te zien.
 
 ## Verzorging bijhouden
 

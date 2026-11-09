@@ -206,6 +206,8 @@ Zonder account gebruikt de website `localStorage`. Een ingelogde gebruiker gebru
 
 Wanneer de collectie leeg is, toont Sproutly een korte uitleg en een knop om planten te bekijken.
 
+Met **Alleen mijn favorieten tonen** kan de gebruiker de collectie filteren op exemplaren die in hun profiel als favoriet zijn gemarkeerd. Als er geen favorieten zijn, verschijnt uitleg en een knop om alle planten weer te tonen.
+
 ### 6.6 Verzorgingstaken
 
 De homepage toont seizoensgebonden taken, bijvoorbeeld:
@@ -408,8 +410,7 @@ De onderstaande voorstellen zijn **nog niet gerealiseerd**:
 1. **Verwijderde plant herstellen:** bied ongedaan maken of een tijdelijke prullenbak. Herstel het specifieke exemplaar met profiel, foto, logboek en bijbehorende planning; communiceer een eventuele bewaartermijn en vraag waar nodig bevestiging.
 2. **Logboekregel bewerken:** laat de gebruiker datum, handeling en notitie van een bestaande regel aanpassen en bevestigen. Valideer de invoer en bereken de planning opnieuw na opslaan.
 3. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
-4. **Favorietenfilter:** laat de gebruiker in Mijn planten alleen favoriete exemplaren tonen en het filter eenvoudig uitschakelen.
-5. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
+4. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
 
 **Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
 

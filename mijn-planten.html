@@ -38,8 +38,10 @@
       </section>
       <section class="saved-plants-panel" aria-labelledby="saved-title">
         <div class="section-heading"><div><p class="eyebrow">Opgeslagen planten</p><h2 id="saved-title">Mijn groene vrienden</h2></div><a class="primary-button" href="planten/">+ Plant toevoegen</a></div>
+        <label class="favorites-filter"><input id="favorites-filter" type="checkbox" /> Alleen mijn favorieten tonen</label>
         <div class="plant-grid" id="saved-plants-grid"></div>
         <div class="empty-state" id="saved-empty" hidden><p>Je hebt nog geen planten opgeslagen.</p><a class="primary-button" href="planten/">Bekijk alle planten</a></div>
+        <div class="empty-state" id="favorites-empty" role="status" hidden><p>Je hebt nog geen favoriete planten. Je kunt een plant als favoriet markeren op de plantpagina.</p><button class="outline-button" type="button" id="show-all-plants">Toon alle planten</button></div>
       </section>
       <section class="newsletter-card page-callout">
         <div><p class="eyebrow">Jouw ritme</p><h2>Plan een rustig<br /><em>verzorgingsmoment.</em></h2></div>

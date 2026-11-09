@@ -18,6 +18,8 @@ document.querySelectorAll(".page-year").forEach((element) => { element.textConte
 const navCount = document.querySelector("#nav-count");
 const savedGrid = document.querySelector("#saved-plants-grid");
 const emptyState = document.querySelector("#saved-empty");
+const favoritesFilter = document.querySelector("#favorites-filter");
+const favoritesEmpty = document.querySelector("#favorites-empty");
 const toast = (message) => {
   const toastElement = document.querySelector("#page-toast");
   if (!toastElement) return;
@@ -91,8 +93,10 @@ function renderSavedPlants() {
     const plant = catalogPlants.find((item) => item.name === name);
     return plant ? { ...plant, instanceId: id, profile: accountState.plantProfiles[id] || {}, displayName: window.SproutlyPlants.label(id, savedNames, accountState.plantProfiles) } : null;
   }).filter(Boolean);
+  const visiblePlants = favoritesFilter?.checked ? plants.filter((plant) => plant.profile.favorite === true) : plants;
   emptyState.hidden = plants.length > 0;
-  savedGrid.innerHTML = plants.map((plant) => `
+  if (favoritesEmpty) favoritesEmpty.hidden = !favoritesFilter.checked || plants.length === 0 || visiblePlants.length > 0;
+  savedGrid.innerHTML = visiblePlants.map((plant) => `
     <article class="plant-card catalog-card">
       <button class="save-plant saved" type="button" data-remove-plant="${window.SproutlyPlants.escape(plant.instanceId)}" aria-label="Verwijder ${window.SproutlyPlants.escape(plant.displayName)} uit Mijn planten">Verwijderen</button>
       <a class="plant-art ${plant.art}" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}" aria-label="Bekijk ${window.SproutlyPlants.escape(plant.displayName)}"><img class="plant-photo" src="${window.SproutlyPlants.escape(plant.profile.photo || plant.image)}" alt="${plant.name}" loading="lazy" decoding="async" /></a>
@@ -147,6 +151,13 @@ function renderSavedPlants() {
     });
   });
 }
+
+favoritesFilter?.addEventListener("change", renderSavedPlants);
+document.querySelector("#show-all-plants")?.addEventListener("click", () => {
+  favoritesFilter.checked = false;
+  renderSavedPlants();
+  favoritesFilter.focus();
+});
 
 const calendarGrid = document.querySelector("#calendar-grid");
 if (calendarGrid) {
