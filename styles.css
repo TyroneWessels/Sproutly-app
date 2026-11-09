@@ -322,6 +322,7 @@ h2 span { color: #cf7d5f; }
 .plant-modal { position: relative; display: grid; grid-template-columns: .8fr 1.2fr; width: min(650px, 100%); max-height: 90vh; overflow-y: auto; overflow-x: hidden; border-radius: 13px; background: var(--paper); box-shadow: 0 25px 60px rgba(23,60,50,.2); }
 .modal-close { position: absolute; top: 13px; right: 17px; z-index: 2; font-size: 26px; }
 .auth-modal { position: relative; width: min(440px, 100%); max-height: 90vh; overflow-y: auto; border-radius: 13px; background: var(--paper); box-shadow: 0 25px 60px rgba(23,60,50,.2); }
+.recovery-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
 .auth-content { padding: 38px 35px 32px; }
 .auth-content h2 { max-width: 290px; font-size: 39px; }
 .auth-intro { margin: 15px 0 22px; color: var(--muted); font-size: 12px; line-height: 1.6; }
@@ -329,6 +330,7 @@ h2 span { color: #cf7d5f; }
 .auth-tab { padding: 8px 13px; border: 1px solid var(--line); border-radius: 18px; background: transparent; color: var(--muted); font-size: 11px; }
 .auth-tab.active { border-color: var(--green); background: var(--green); color: #fff; }
 .auth-content form { display: grid; gap: 11px; }
+.auth-content form[hidden] { display: none; }
 .auth-content label { display: grid; gap: 5px; color: var(--muted); font-size: 10px; }
 .auth-content input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 5px; outline: 0; background: #fff; color: var(--ink); font-size: 12px; }
 .auth-content input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(47,114,89,.1); }

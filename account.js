@@ -115,11 +115,27 @@
     stateExists = false;
   }
 
+  async function requestPasswordReset(email, redirectTo) {
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  }
+
+  function onPasswordRecovery(callback) {
+    return client.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") callback();
+    }).data.subscription;
+  }
+
+  async function updatePassword(password) {
+    const { error } = await client.auth.updateUser({ password });
+    if (error) throw error;
+  }
+
   async function deleteAccount() {
     const { error } = await client.rpc("delete_own_sproutly_account");
     if (error) throw error;
     await client.auth.signOut({ scope: "local" });
   }
 
-  window.SproutlyAccount = { getUser, getState, saveState, register, login, logout, deleteAccount };
+  window.SproutlyAccount = { getUser, getState, saveState, register, login, logout, deleteAccount, requestPasswordReset, onPasswordRecovery, updatePassword };
 })();

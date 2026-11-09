@@ -14,6 +14,8 @@ De kalender toont het eerstvolgende verzorgingsmoment per plant en handeling. De
 
 Het Supabase-pakket wordt lokaal gebundeld zodat GitHub Pages geen npm-installatie nodig heeft. Na een wijziging aan de SDK: `npm install` en `npm run build:supabase`. Controleer daarnaast de Supabase-instellingen voor toegestane website-URL's, back-ups en productiegebruik.
 
+Voor wachtwoordherstel moet de volledige URL van `herstel.html` voor elke gebruikte omgeving bij Supabase onder **Authentication → URL Configuration → Redirect URLs** worden toegestaan. Stel ook de Site URL, e-mailprovider en het herstelmailtemplate correct in, zodat de link naar de toegestane redirect terugkeert. Test het aanvragen van een link, het instellen van een nieuw wachtwoord en een verlopen link met een eigen testaccount. De website geeft bewust geen bevestiging of een e-mailadres bestaat.
+
 ## Lokale Node-server
 
 ## Vereisten

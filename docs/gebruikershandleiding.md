@@ -32,6 +32,7 @@ Zonder account blijven gegevens in de huidige browser staan. Met een account wor
 In het accountvenster kun je:
 
 - uitloggen;
+- via **Wachtwoord vergeten?** een herstellink aanvragen en daarmee een nieuw wachtwoord kiezen;
 - je gegevens exporteren als JSON;
 - je account en servergegevens verwijderen.
 

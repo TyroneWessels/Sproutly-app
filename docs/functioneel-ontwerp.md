@@ -25,13 +25,13 @@ Sproutly helpt gebruikers om:
 
 ### Primaire doelgroep
 
-Beginnende plantenliefhebbers die meerdere planten hebben, maar niet altijd weten wat iedere plant nodig heeft. Dit is de primaire doelgroep voor versie 1.
+Beginnende plantenliefhebbers die meerdere planten hebben, maar niet altijd weten wat iedere plant nodig heeft. De interface houdt ook rekening met oudere en minder digitaal vaardige gebruikers.
 
 ### Belangrijkste gebruikssituatie
 
 De belangrijkste gebruikssituatie is: een beginnende plantenliefhebber zoekt een onbekende plant op en wil binnen enkele seconden begrijpen wat de belangrijkste verzorgingsactie is.
 
-De gebruiker zoekt bijvoorbeeld op “Monstera”, opent de plantdetails en krijgt direct informatie over licht, water, verpotten en de eerstvolgende verzorgingsstap. Deze gebruikssituatie bepaalt de prioriteit van de homepage, zoekfunctie en plantdetails.
+De gebruiker zoekt bijvoorbeeld op “Monstera”, opent de plantpagina en krijgt informatie over licht, water en het controleren van de aarde. Deze gebruikssituatie bepaalt de prioriteit van de homepage, zoekfunctie en plantdetails.
 
 ### Secundaire doelgroep
 
@@ -97,10 +97,10 @@ De website bestaat uit de volgende hoofdonderdelen:
    - Planten direct toevoegen aan Mijn planten.
 3. **Mijn planten**
    - Persoonlijke plantenlijst.
-   - Status en volgende verzorgingsactie.
+   - Eigen naam, locatie en toegang tot de plantpagina.
 4. **Verzorgingskalender**
-   - Seizoensgebonden taken.
-   - Afgevinkte en openstaande taken.
+   - Het eerstvolgende verzorgingsmoment per plant en handeling.
+   - Registreren van uitgevoerde handelingen.
 5. **Plantdetails**
    - Verzorgingsinformatie voor één plant.
    - Plant opslaan in de collectie.
@@ -172,26 +172,11 @@ Klikken op de foto of kaart opent de plantdetails.
 
 ### 6.4 Plantdetails
 
-Het detailvenster bevat:
+De aparte plantpagina toont een foto met bronlink, categorie, Nederlandse en wetenschappelijke naam, beschrijving, lichtbehoefte, interval voor aardcontrole, moeilijkheid en wateradvies. De gebruiker kan een exemplaar toevoegen en bij meerdere exemplaren via een keuzelijst de gewenste plant openen.
 
-- Foto.
-- Categorie.
-- Nederlandse naam.
-- Wetenschappelijke naam.
-- Korte beschrijving.
-- Belangrijkste verzorgingsfeiten.
-- Volgende aanbevolen stap.
-- Grondsoort, luchtvochtigheid en temperatuur.
-- Groeihoogte, huisdiervriendelijkheid en moeilijkheidsgraad.
-- Zaaien/planten, snoeien, bemesten en oogsten/bloeiperiode wanneer relevant.
-- Bron en datum waarop de informatie is gecontroleerd.
-- Knop **Aan mijn planten toevoegen**.
+Voor een opgeslagen exemplaar bevat de pagina een persoonlijk profiel en verzorgingslogboek. Na opslaan verschijnt een overzicht; via **Plantgegevens bewerken** kan de gebruiker de opgeslagen gegevens opnieuw aanpassen.
 
-Het venster kan gesloten worden via:
-
-- De sluitknop.
-- Klikken buiten het venster.
-- De Escape-toets.
+Uitgebreide verzorgingsinformatie en controleerbare bronnen met verificatiedatum voor alle plantpagina's blijven openstaande werkzaamheden.
 
 ### 6.5 Mijn planten
 
@@ -202,8 +187,7 @@ Per opgeslagen plant wordt getoond:
 - Foto.
 - Naam.
 - Wetenschappelijke naam.
-- Huidige status.
-- Volgende verzorgingsactie.
+- Eigen naam en locatie, indien ingevuld.
 
 Via de plantdetails kan de gebruiker de opgeslagen plant personaliseren met:
 
@@ -216,27 +200,27 @@ Via de plantdetails kan de gebruiker de opgeslagen plant personaliseren met:
 
 Zonder account worden deze gegevens in de browser opgeslagen. Na inloggen worden ze server-side opgeslagen en bij een nieuw bezoek opnieuw geladen.
 
-De gebruiker kan een plant verwijderen door opnieuw op het hartje te klikken. Het aantal planten wordt automatisch bijgewerkt.
+De gebruiker kan meerdere exemplaren van dezelfde soort toevoegen. Via **Verwijderen** in Mijn planten wordt na bevestiging één exemplaar met profiel en logboek verwijderd. Het aantal planten wordt automatisch bijgewerkt.
 
-De anonieme fallback gebruikt `localStorage`. Een ingelogde gebruiker gebruikt de server-API; lokale opslag is dan niet de bron van waarheid.
+Zonder account gebruikt de website `localStorage`. Een ingelogde gebruiker gebruikt Supabase als bron van waarheid; de lokale browsergegevens blijven daarvan gescheiden.
 
-Wanneer de collectie leeg is, toont Sproutly een korte uitleg en de knop **Plant zoeken**. Deze knop brengt de gebruiker terug naar de zoekbalk bovenaan de pagina.
+Wanneer de collectie leeg is, toont Sproutly een korte uitleg en een knop om planten te bekijken.
 
 ### 6.6 Verzorgingstaken
 
-De verzorgingskalender toont seizoensgebonden taken, bijvoorbeeld:
+De homepage toont seizoensgebonden taken, bijvoorbeeld:
 
 - Zoek meer licht.
 - Begin met zaaien.
 - Ververs de aarde.
 
-Een gebruiker kan een taak afvinken. De taak krijgt dan een afgeronde status. Opnieuw klikken zet de taak terug naar openstaand.
+Een gebruiker kan een seizoenssuggestie afvinken en opnieuw openen. Verzorgingsmomenten voor individuele planten worden afzonderlijk in het logboek geregistreerd.
 
 De status van taken blijft zonder account bewaard in `localStorage`. Voor ingelogde gebruikers wordt de status server-side opgeslagen.
 
 ### 6.7 Herinnering
 
-De gebruiker kan een seizoensherinnering instellen. Sproutly vraagt hiervoor expliciet toestemming via de browser Notification API. Bij toestemming toont de browser een melding; wanneer de gebruiker weigert of de browser dit niet ondersteunt, toont Sproutly een duidelijke tekstuele melding. De prototypeversie plant geen achtergrondmeldingen voor toekomstige datums.
+De homepage kan via de browser Notification API toestemming vragen en direct een testmelding tonen. De kalenderpagina controleert de toestemming. Bij weigering of een niet-ondersteunde browser volgt een tekstuele melding. Er worden geen automatische achtergrondmeldingen voor toekomstige datums gepland.
 
 ### 6.8 Verzorgingsoverzicht
 
@@ -247,7 +231,7 @@ Onder de collectie staat een compact overzicht met:
 - Een weekweergave met de dagen van maandag tot en met zondag.
 - Een rustige status wanneer er vandaag geen dringende taak is.
 
-De taken voor vandaag worden gebaseerd op de opgeslagen planten en hun actuele status. Een gebruiker kan een taak vanuit dit overzicht afvinken; de status wordt lokaal bewaard.
+De taken volgen het logboek en de opgeslagen exemplaren. Na bevestiging registreert afvinken de bijbehorende handeling op vandaag; de volgende datum wordt opnieuw berekend. Dit wordt lokaal of bij het account bewaard.
 
 ### 6.9 Seizoensbepaling
 
@@ -278,15 +262,15 @@ De verzorgingskalender bevat naast het weekoverzicht een maandweergave met:
 - Een visuele markering voor vandaag.
 - Een markering op dagen met verzorgingsmomenten.
 - Een detailpaneel voor de geselecteerde dag.
-- Een knop om een verzorgingsmoment vanuit het detailpaneel af te vinken of opnieuw te openen.
+- Een knop om een handeling na bevestiging op vandaag in het logboek vast te leggen.
 
-In de prototypeversie worden verzorgingsmomenten voorlopig afgeleid uit de status van opgeslagen planten. Automatische intervallen voor water geven, snoeien, bemesten en verpotten blijven een afzonderlijke vervolgstap.
+De maandkalender toont het eerstvolgende moment per plant en handeling, geen volledige reeks vooruit. Een foutieve registratie kan via het logboek worden verwijderd.
 
 ### 6.12 Automatische verzorgingsplanning
 
-De prototypeversie berekent terugkerende verzorgingsmomenten voor opgeslagen planten. De eerste standaardintervallen zijn:
+De website berekent het eerstvolgende verzorgingsmoment per exemplaar vanaf de laatste toepasselijke logboekdatum. Aarde controleren en water geven plannen de volgende aardcontrole. De eerste standaardintervallen voor voorbeelden zijn:
 
-| Planttype/voorbeeld | Water geven | Bemesten | Verpotten |
+| Planttype/voorbeeld | Aardcontrole | Voeding | Verpotten |
 |---|---:|---:|---:|
 | Monstera | 7 dagen | 28 dagen | 365 dagen |
 | Basilicum | 3 dagen | 14 dagen | 180 dagen |
@@ -296,77 +280,40 @@ De prototypeversie berekent terugkerende verzorgingsmomenten voor opgeslagen pla
 | Rozemarijn | 10 dagen | 90 dagen | 365 dagen |
 | Pannenkoekenplant | 7 dagen | 28 dagen | 365 dagen |
 
-De planning wordt tot één jaar vooruit berekend. De intervallen zijn startwaarden voor herinneringen, geen absoluut horticultuuradvies. Taken kunnen in een latere stap door de gebruiker worden aangepast of uitgesteld.
+De laatst geregistreerde watergift of aardcontrole bepaalt de volgende aardcontrole. Zonder eerdere registratie verschijnt een eerste controle vandaag. Voeding en verpotten worden alleen gepland voor soorten met een bekend interval en na een eerdere registratie van die handeling. Snoeien wordt niet automatisch gepland. Achterstallige momenten verschijnen vandaag met de oorspronkelijk geplande datum. Het verwijderen van een logboekregel herberekent de planning. Intervallen zijn richtlijnen: controleer altijd eerst de plant en de aarde.
 
 ### 6.13 Taken uitstellen
 
-Bij een gepland kalenderitem kan de gebruiker kiezen voor **+1 dag** of **+1 week**. Het gekozen moment wordt lokaal opgeslagen als een wijziging op die specifieke gebeurtenis. De oorspronkelijke standaardinterval blijft ongewijzigd voor volgende gebeurtenissen.
+Bij een gepland kalenderitem op de homepage kan de gebruiker kiezen voor **+1 dag** of **+1 week**. De wijziging wordt bij de browsergegevens of het account opgeslagen. De oorspronkelijke standaardinterval blijft ongewijzigd.
 
 ### 6.14 Accounts en synchronisatie
 
 De gebruiker kan een account maken met een schermnaam, e-mailadres en wachtwoord. Na registratie of login:
 
-- krijgt de gebruiker een HttpOnly sessiecookie;
-- wordt de collectie geladen vanaf de server;
-- worden wijzigingen aan planten, profielen, taken en uitstelmomenten naar de server gesynchroniseerd;
+- wordt de Supabase Auth-sessie gebruikt;
+- wordt de collectie geladen uit Supabase;
+- worden wijzigingen aan planten, profielen, taken en uitstelmomenten naar Supabase gesynchroniseerd;
 - kan de gebruiker uitloggen zonder dat de vorige accountdata in de nieuwe sessie zichtbaar blijft.
 
-De prototypebackend gebruikt een lokaal JSON-bestand als server-side opslag. Dit is bedoeld voor ontwikkeling; een productieversie moet deze opslag vervangen door een echte database en back-upstrategie.
+Gebruikersgegevens staan als JSONB in een Supabase-tabel met Row Level Security. Opslaan vergelijkt de huidige serverstatus met de eerder geladen versie en meldt conflicten in plaats van andere wijzigingen stilzwijgend te overschrijven. Bij een nieuw account worden lokale browsergegevens gekopieerd. De oudere Node-backend en zijn lokale JSON-bestand staan los van de huidige accountfunctie; oude Node-accounts worden niet automatisch overgezet. Productieback-ups en herstel moeten nog worden ingericht en getest. De huidige configuratie vereist geen e-mailbevestiging, zodat eigenaarschap van het e-mailadres niet wordt gecontroleerd.
 
 ## 7. Gegevensmodel
 
 ### 7.1 Plant
 
-| Veld | Type | Verplicht | Omschrijving |
-|---|---|---:|---|
-| `id` | string | Ja | Unieke identificatie |
-| `name` | string | Ja | Nederlandse plantnaam |
-| `scientificName` | string | Ja | Wetenschappelijke naam |
-| `category` | string | Ja | Binnenplant, buitenplant of kruid |
-| `imageUrl` | string | Ja | URL van de plantfoto |
-| `description` | string | Ja | Korte uitleg |
-| `light` | string | Ja | Benodigde hoeveelheid licht |
-| `watering` | string | Ja | Wateradvies |
-| `soil` | string | Nee | Advies voor aarde |
-| `repotting` | string | Nee | Advies voor verpotten |
-| `nextCare` | string | Ja | Volgende aanbevolen actie |
-| `sourceUrl` | string | Ja | Controleerbare URL van de bron |
-| `imageLicenseUrl` | string | Ja | URL van de licentie voor de plantfoto |
-| `lastVerified` | date | Nee | Datum waarop de data is gecontroleerd |
+De lokale catalogus bevat onder meer `name`, `scientific`, `aliases`, `category`, `type`, `light`, `difficulty`, `image`, `imageSource` en `soilCheckDays`. Beschrijvingen en wateradvies worden op de plantpagina aangevuld. De foto is lokaal gebundeld en `imageSource` verwijst naar de bronpagina. Een volledig gecontroleerde verzorgingsbron en verificatiedatum voor elke soort zijn nog niet beschikbaar.
 
 ### 7.2 Opgeslagen plant
 
-| Veld | Type | Omschrijving |
-|---|---|---|
-| `plantId` | string | Verwijzing naar een plant |
-| `customName` | string | Eigen naam van de gebruiker |
-| `location` | string | Plaats van de plant |
-| `notes` | string | Persoonlijke notities |
-| `addedAt` | date | Datum waarop de plant is toegevoegd |
-| `nextWatering` | date | Volgend watermoment |
-| `nextRepotting` | date | Volgend verpotmoment |
+`savedPlants` is een lijst van exemplaar-ID's. Oudere opgeslagen planten kunnen de soortnaam als ID gebruiken. `plantProfiles` bevat per ID het profiel met onder meer `species`, `customName`, `location`, `date`, `notes`, `favorite`, `photo` en `careLog`. Een eigen foto wordt als data-URL in het profiel opgeslagen; het gekozen bestand mag maximaal 500 KB zijn.
 
 ### 7.3 Verzorgingstaak
 
-| Veld | Type | Omschrijving |
-|---|---|---|
-| `id` | string | Unieke identificatie |
-| `title` | string | Naam van de taak |
-| `description` | string | Uitleg van de taak |
-| `season` | string | Seizoen waarin de taak relevant is |
-| `completed` | boolean | Of de taak is afgerond |
-| `completedAt` | date | Moment van afronden |
+Een logboekregel bevat een ID, datum, handeling en notitie. Verzorgingsmomenten worden daaruit berekend en niet als vaste volgende datums in het profiel bewaard. `completedTasks` bevat afgeronde taken en `careOverrides` bevat uitstelmomenten.
 
 ### 7.4 Account en serverstatus
 
-| Veld | Type | Omschrijving |
-|---|---|---|
-| `userId` | string | Unieke accountidentificatie |
-| `email` | string | Loginadres |
-| `displayName` | string | Naam die in Sproutly wordt getoond |
-| `passwordHash` | string | Veilige wachtwoordhash; nooit het wachtwoord zelf |
-| `passwordSalt` | string | Unieke salt voor de hash |
-| `state` | object | Opgeslagen planten, profielen, taken en uitstelmomenten |
+Supabase Auth beheert het account en de sessie. De tabel `sproutly_user_data` koppelt een gebruikers-ID aan een JSONB-status met `savedPlants`, `plantProfiles`, `completedTasks` en `careOverrides`. De plantstatus bevat geen wachtwoord.
 
 ## 8. Niet-functionele eisen
 
@@ -396,7 +343,7 @@ De prototypebackend gebruikt een lokaal JSON-bestand als server-side opslag. Dit
 
 ### Prestaties
 
-- Kaartafbeeldingen gebruiken lazy loading, responsive `srcset`/`sizes` en asynchrone decoding; de hero-afbeelding krijgt hoge laadprioriteit.
+- Kaartafbeeldingen gebruiken lazy loading en asynchrone decoding; de hero-afbeelding krijgt hoge laadprioriteit.
 - De eerste pagina moet snel zichtbaar zijn.
 - API-aanvragen krijgen een laadstatus.
 - Fouten bij externe data worden duidelijk gemeld.
@@ -405,7 +352,7 @@ De prototypebackend gebruikt een lokaal JSON-bestand als server-side opslag. Dit
 
 - Alleen noodzakelijke gebruikersdata wordt opgeslagen.
 - Gegevens kunnen later worden verwijderd.
-- API-sleutels komen niet in de publieke frontend.
+- Alleen de publiceerbare Supabase-sleutel mag in de publieke frontend staan; geheime sleutels en de service-role-sleutel niet.
 - Gebruikersinvoer wordt gevalideerd en veilig weergegeven.
 
 ## 9. Belangrijkste gebruikersscenario’s
@@ -417,28 +364,28 @@ Jamie wil weten hoe een Monstera verzorgd moet worden.
 1. Jamie opent Sproutly.
 2. Jamie typt “Monstera” in de zoekbalk.
 3. Jamie klikt op de Monstera-kaart.
-4. Sproutly toont licht-, water- en verpotinformatie.
-5. Jamie leest de volgende verzorgingsstap.
+4. Sproutly toont licht- en waterinformatie.
+5. Jamie leest wanneer de aarde opnieuw gecontroleerd kan worden.
 
 ### Scenario B — Een plant bewaren
 
 Jamie heeft een Basilicumplant en wil deze onthouden.
 
 1. Jamie zoekt op Basilicum.
-2. Jamie klikt op het hartje.
+2. Jamie voegt een exemplaar toe.
 3. Sproutly toont een bevestiging.
 4. Basilicum verschijnt in Mijn planten.
 5. De keuze blijft staan na het vernieuwen van de pagina.
 
 ### Scenario C — Een taak afronden
 
-Jamie wil bijhouden welke lentetaken zijn gedaan.
+Jamie wil een verzorgingshandeling vastleggen.
 
 1. Jamie opent de verzorgingskalender.
-2. Jamie klikt op de cirkel bij “Ververs de aarde”.
-3. De taak verandert naar een vinkje.
-4. Sproutly toont een korte bevestiging.
-5. De afgeronde status blijft bewaard.
+2. Jamie kiest een gepland verzorgingsmoment en bevestigt dat de handeling vandaag is uitgevoerd.
+3. Sproutly registreert de handeling in het logboek.
+4. De volgende datum wordt op basis van de registratie berekend.
+5. Bij een vergissing kan Jamie de logboekregel verwijderen, waarna de planning opnieuw wordt berekend.
 
 ## 10. Acceptatiecriteria
 
@@ -447,18 +394,29 @@ De eerste versie voldoet wanneer:
 - de website volledig Nederlandstalig is;
 - een gebruiker op naam kan zoeken;
 - filters zichtbaar en werkend zijn;
-- plantdetails geopend en gesloten kunnen worden;
+- plantdetails op een afzonderlijke pagina bekeken kunnen worden;
 - een plant toegevoegd en verwijderd kan worden;
 - opgeslagen planten na een refresh behouden blijven;
-- verzorgingstaken afgevinkt en teruggezet kunnen worden;
+- verzorgingshandelingen geregistreerd kunnen worden en een foutieve logboekregel kan worden verwijderd;
 - de website bruikbaar is op mobiel en desktop;
 - er geen JavaScript-syntaxfouten of kapotte primaire interacties zijn.
 
 ## 11. Toekomstige uitbreidingen
 
-Na versie 1 kunnen de volgende functies worden toegevoegd:
+De onderstaande voorstellen zijn **nog niet gerealiseerd**:
 
-- Persoonlijke accounts en synchronisatie.
+1. **Verwijderde plant herstellen:** bied ongedaan maken of een tijdelijke prullenbak. Herstel het specifieke exemplaar met profiel, foto, logboek en bijbehorende planning; communiceer een eventuele bewaartermijn en vraag waar nodig bevestiging.
+2. **Logboekregel bewerken:** laat de gebruiker datum, handeling en notitie van een bestaande regel aanpassen en bevestigen. Valideer de invoer en bereken de planning opnieuw na opslaan.
+3. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
+4. **Favorietenfilter:** laat de gebruiker in Mijn planten alleen favoriete exemplaren tonen en het filter eenvoudig uitschakelen.
+5. **Korte rondleiding:** leg in begrijpelijke taal uit hoe zoeken, toevoegen en verzorgen werkt. De rondleiding is optioneel, kan worden overgeslagen en later opnieuw worden geopend.
+
+**Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
+
+Eerder vastgelegde openstaande punten blijven onder meer automatische geplande herinneringen, gebruikerstesten met oudere en minder digitaal vaardige gebruikers, schermlezertesten en geteste productieback-ups. Een browsertestmelding is geen automatische herinnering.
+
+Andere mogelijke uitbreidingen:
+
 - Locatiegebaseerde plantkalender met klimaat- en weersinvloeden.
 - Weerswaarschuwingen en vorstmeldingen.
 - Plantproblemen herkennen met een foto.
@@ -470,6 +428,8 @@ Na versie 1 kunnen de volgende functies worden toegevoegd:
 - Meertaligheid naast Nederlands.
 
 ## Wijzigingslog
+
+De onderstaande vermeldingen zijn historisch en beschrijven beslissingen en prototypes op dat moment. Voor de huidige werking en openstaande voorstellen gelden de secties hierboven.
 
 ### 5 november 2026
 
