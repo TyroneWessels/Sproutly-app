@@ -102,7 +102,7 @@ function renderSavedPlants() {
       ${plant.profile.location ? `<p class="catalog-card-meta">${window.SproutlyPlants.escape(plant.profile.location)}</p>` : ""}
       <p class="scientific-name">${plant.scientific}</p>
       <p class="catalog-card-meta">${plant.light} · ${plant.difficulty === "easy" ? "Makkelijk" : "Gemiddeld"}</p>
-      <a class="plant-details-link" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}">Bekijk plant en verzorging →</a>
+      <a class="plant-details-link" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}">Bekijk plant en verzorging</a>
       <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
   `).join("");

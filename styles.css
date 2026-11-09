@@ -109,7 +109,6 @@ h1 em, h2 em { color: #cf7d5f; font-style: normal; }
 h2 { font-size: 38px; }
 h2 span { color: #cf7d5f; }
 .text-link, .collection-link { color: var(--green); font-size: 12px; font-weight: 700; }
-.text-link span, .collection-link span { display: inline-block; margin-left: 7px; font-size: 17px; vertical-align: -2px; }
 .task-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
 .task-card { display: grid; grid-template-columns: 47px 1fr 25px; align-items: center; min-height: 130px; padding: 19px; border-radius: 9px; }
 .task-card-green { background: #dcebd7; }
@@ -309,7 +308,6 @@ h2 span { color: #cf7d5f; }
 .newsletter-card h2 { font-size: 36px; }
 .newsletter-card > p { max-width: 210px; color: #6f5a54; font-size: 12px; line-height: 1.6; }
 .outline-button { padding: 12px 15px; border: 1px solid #9a6f60; border-radius: 6px; background: transparent; color: #714d42; font-size: 11px; font-weight: 700; white-space: nowrap; }
-.outline-button span { margin-left: 15px; font-size: 16px; }
 .site-footer { display: flex; justify-content: space-between; padding: 0 0 30px; color: var(--muted); font-size: 10px; }
 .site-footer span span { color: #cf7d5f; font-size: 14px; }
 .site-footer a { color: var(--green); font-weight: 700; }
@@ -532,8 +530,6 @@ h1 em, h2 em, h2 span { color: #a44f35; }
 .care-water-tip { display: flex; gap: 16px; align-items: flex-start; margin-top: 22px; padding: 20px 22px; border-left: 4px solid #6c9d9a; border-radius: 4px 18px 18px 4px; background: #edf6f1; }
 .care-water-icon { color: #306d71; background: #d3ebe4; }
 .care-calendar-link { display: inline-flex; align-items: center; gap: 12px; min-height: 48px; margin-top: 18px; color: var(--green); font-weight: 800; text-decoration: underline; text-underline-offset: 4px; }
-.care-calendar-link span:last-child { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #dcebd7; text-decoration: none; }
-.care-calendar-link:hover span:last-child { background: var(--green); color: #fff; }
 .detail-form input:not([type="checkbox"]), .detail-form textarea, .detail-form select { border-radius: 9px; }
 .detail-form button, .plant-detail-intro button { font-size: 16px; }
 .plant-instance-picker { display: grid; gap: 6px; max-width: 380px; margin-top: 20px; }
