@@ -1,6 +1,6 @@
 # Sproutly gebruikershandleiding
 
-Op de homepage kun je met **Bekijk de korte rondleiding** uitleg krijgen over zoeken, toevoegen en verzorgen. Je kunt de rondleiding sluiten en later opnieuw openen.
+Op de homepage kun je met **Bekijk de korte rondleiding** uitleg krijgen over zoeken, toevoegen en verzorgen. Met **Volgende** en **Vorige** ga je naar de bijbehorende pagina's; de Monstera is een voorbeeld en wordt niet automatisch toegevoegd. Je kunt de rondleiding op elke pagina sluiten en later op de homepage opnieuw openen.
 
 ## Een plant zoeken
 

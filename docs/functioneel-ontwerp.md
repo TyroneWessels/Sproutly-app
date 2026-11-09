@@ -410,7 +410,7 @@ De onderstaande voorstellen zijn **nog niet gerealiseerd**:
 1. **Verwijderde plant herstellen:** bied ongedaan maken of een tijdelijke prullenbak. Herstel het specifieke exemplaar met profiel, foto, logboek en bijbehorende planning; communiceer een eventuele bewaartermijn en vraag waar nodig bevestiging.
 2. **JSON-export terugzetten:** valideer het gekozen bestand en toon vooraf welke gegevens worden toegevoegd of vervangen. Vraag expliciete bevestiging en overschrijf geen gegevens stilzwijgend; geef fouten begrijpelijk weer.
 
-De optionele rondleiding op de homepage legt zoeken, toevoegen en verzorgen uit. De gebruiker opent deze zelf, kan de rondleiding op elk moment sluiten en later opnieuw openen.
+De optionele rondleiding start op de homepage en bezoekt de pagina's voor zoeken, een voorbeeldplant, Mijn planten en de verzorgingskalender. De gebruiker opent deze zelf, kan tussen de stappen terug- en vooruitgaan, de rondleiding op elke pagina sluiten en later opnieuw openen. De voorbeeldplant wordt niet automatisch toegevoegd.
 
 **Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
 
