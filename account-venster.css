@@ -1,0 +1,44 @@
+.auth-tabs[hidden], .account-data-actions[hidden], .auth-logout[hidden], .auth-account-summary[hidden], .auth-content label[hidden] {
+  display: none;
+}
+
+.auth-account-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid #d5e0d1;
+  border-radius: 16px 16px 16px 5px;
+  background: linear-gradient(135deg, #f3f8ed, #e1efda);
+}
+
+.auth-account-icon {
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50% 50% 50% 14px;
+  background: #d3e8cd;
+  color: #2f7259;
+  font-size: 21px;
+}
+
+.auth-account-summary > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.auth-account-summary strong {
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.auth-account-summary div > span {
+  color: #495f55;
+  font-size: 15px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}

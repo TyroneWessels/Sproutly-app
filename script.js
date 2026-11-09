@@ -159,6 +159,11 @@ const authModal = document.querySelector("#auth-modal");
 const authClose = document.querySelector("#auth-close");
 const authForm = document.querySelector("#auth-form");
 const authTitle = document.querySelector("#auth-title");
+const authIntro = document.querySelector(".auth-intro");
+const authTabs = document.querySelector(".auth-tabs");
+const authAccountSummary = document.querySelector("#auth-account-summary");
+const authAccountName = document.querySelector("#auth-account-name");
+const authAccountEmail = document.querySelector("#auth-account-email");
 const authStatus = document.querySelector("#auth-status");
 const authSubmit = document.querySelector("#auth-submit");
 const authDisplayNameField = document.querySelector("#display-name-field");
@@ -319,14 +324,20 @@ function setAuthMode(mode) {
   authMode = mode;
   document.querySelectorAll("[data-auth-mode]").forEach((tab) => tab.classList.toggle("active", tab.dataset.authMode === mode));
   const registering = mode === "register";
-  authTitle.textContent = registering ? "Bewaar je planten overal." : "Welkom terug bij Sproutly.";
+  const signedIn = Boolean(currentUser);
+  authTitle.textContent = signedIn ? "Jouw groene account." : registering ? "Bewaar je planten overal." : "Welkom terug bij Sproutly.";
+  authIntro.hidden = signedIn;
+  authTabs.hidden = signedIn;
+  authAccountSummary.hidden = !signedIn;
+  authAccountName.textContent = signedIn ? currentUser.displayName : "";
+  authAccountEmail.textContent = signedIn ? currentUser.email : "";
   authSubmit.textContent = registering ? "Account maken" : "Inloggen";
   authDisplayNameField.hidden = !registering;
   authDisplayName.required = registering;
   authPassword.autocomplete = registering ? "new-password" : "current-password";
-  logoutButton.hidden = !currentUser;
-  authForm.hidden = Boolean(currentUser);
-  authStatus.textContent = currentUser ? `Ingelogd als ${currentUser.email}` : "";
+  logoutButton.hidden = !signedIn;
+  authForm.hidden = signedIn;
+  authStatus.textContent = "";
 }
 
 function openAuthModal() {
@@ -1043,6 +1054,7 @@ authForm.addEventListener("submit", async (event) => {
     backendAvailable = true;
     applyServerState(await apiRequest("/api/me/state"));
     updateAccountUi();
+    setAuthMode("login");
     renderAll();
     authStatus.textContent = "Je account is klaar.";
     window.setTimeout(closeAuthModal, 500);
