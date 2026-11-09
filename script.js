@@ -314,7 +314,7 @@ function updateAccountUi() {
     accountDataActions.hidden = false;
     return;
   }
-  accountAvatar.textContent = "JM";
+  accountAvatar.textContent = "SP";
   accountNameLabel.textContent = "Inloggen";
   profileButton.setAttribute("aria-label", "Inloggen of account maken");
   accountDataActions.hidden = true;
