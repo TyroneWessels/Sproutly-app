@@ -27,7 +27,7 @@ requestForm.addEventListener("submit", async (event) => {
   button.disabled = true;
   status.textContent = "Je aanvraag wordt verwerkt…";
   try {
-    await account.requestPasswordReset(email.value.trim(), new URL("herstel.html", location.href).href.split("#")[0].split("?")[0]);
+    await account.requestPasswordReset(email.value.trim(), new URL("herstel.html", document.baseURI).href);
     status.textContent = "Als er een account bestaat voor dit adres, ontvang je een herstellink. Controleer ook je ongewenste e-mail.";
   } catch (error) {
     console.error("Wachtwoordherstel aanvragen mislukt:", error);

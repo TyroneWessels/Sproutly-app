@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <base href="../" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wachtwoord herstellen | Sproutly</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="herstel.css" />
+</head>
+<body>
+  <header class="recovery-header">
+    <a class="brand" href="./" aria-label="Sproutly startpagina"><span class="brand-mark" aria-hidden="true">✦</span><span>sproutly</span></a>
+  </header>
+  <main class="recovery-page">
+    <section class="recovery-card auth-content" aria-labelledby="recovery-title">
+      <p class="eyebrow">Jouw groene account</p>
+      <h1 id="recovery-title">Wachtwoord <em>herstellen.</em></h1>
+      <p id="recovery-intro">Vul je e-mailadres in. Als er een account bestaat, ontvang je een link om een nieuw wachtwoord te kiezen.</p>
+      <form id="recovery-request">
+        <label>E-mailadres<input id="recovery-email" type="email" autocomplete="email" required /></label>
+        <button class="primary-button" type="submit">Stuur herstellink</button>
+      </form>
+      <form id="recovery-update" hidden>
+        <label>Nieuw wachtwoord<input id="recovery-password" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <label>Herhaal nieuw wachtwoord<input id="recovery-confirm" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="primary-button" type="submit">Nieuw wachtwoord opslaan</button>
+      </form>
+      <p class="auth-status" id="recovery-status" role="status" aria-live="polite"></p>
+      <a class="text-button" href="./?account=1">Terug naar inloggen</a>
+    </section>
+  </main>
+  <script src="assets/supabase-client.js"></script>
+  <script src="account.js"></script>
+  <script src="herstel.js"></script>
+</body>
+</html>

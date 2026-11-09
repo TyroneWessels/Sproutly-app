@@ -13,6 +13,11 @@ const logForm = document.querySelector("#care-log-form");
 const logList = document.querySelector("#care-log-list");
 const plantPicker = document.querySelector("#plant-instance-picker");
 const plantSelect = document.querySelector("#plant-instance");
+const skipLink = document.querySelector(".skip-link");
+function updateSkipLink() {
+  skipLink.href = `${location.pathname}${location.search}#plant-main`;
+}
+updateSkipLink();
 const fields = {
   name: document.querySelector("#detail-name"),
   location: document.querySelector("#detail-location"),
@@ -307,7 +312,7 @@ if (!plant) {
       plantSelect.value = selectedId || "";
       return;
     }
-    location.href = window.SproutlyPlants.url(plant.name, plantSelect.value);
+    location.href = new URL(window.SproutlyPlants.url(plant.name, plantSelect.value), document.baseURI).href;
   });
 
   addButton.addEventListener("click", async () => {
@@ -318,7 +323,8 @@ if (!plant) {
     selectedId = window.SproutlyPlants.create(plant.name, state.plantProfiles);
     state.savedPlants.push(selectedId);
     if (await save(`${plant.name} is toegevoegd aan Mijn planten. Geef deze plant hieronder een eigen naam.`, previousState)) {
-      history.replaceState(null, "", window.SproutlyPlants.url(plant.name, selectedId));
+      history.replaceState(null, "", new URL(window.SproutlyPlants.url(plant.name, selectedId), document.baseURI).href);
+      updateSkipLink();
       fields.photo.value = "";
       fields.action.value = "";
       fields.logNotes.value = "";

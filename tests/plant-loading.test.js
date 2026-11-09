@@ -24,11 +24,11 @@ async function loadPage(account, storedPlants, storedProfiles) {
   const storage = new Map();
   if (storedPlants !== undefined) storage.set("sproutly-plants", storedPlants);
   if (storedProfiles !== undefined) storage.set("sproutly-profiles", storedProfiles);
-  const document = { querySelector: element, createElement: () => element(Symbol()), title: "" };
+  const document = { querySelector: element, createElement: () => element(Symbol()), title: "", baseURI: "https://example.test/" };
   const plant = { name: "Monstera", category: "Binnenplant", scientific: "Monstera deliciosa", type: "Kamerplant", light: "Indirect licht", difficulty: "easy", soilCheckDays: 7, image: "plant.jpg", imageSource: "bron" };
   const context = {
     document, location: { search: "?naam=Monstera" }, history: { replaceState() {} },
-    URLSearchParams, Date, JSON, Object, Array, String, Uint8Array, crypto: webcrypto,
+    URL, URLSearchParams, Date, JSON, Object, Array, String, Uint8Array, crypto: webcrypto,
     window: { SPROUTLY_PLANTS: [plant], SPROUTLY_DEFAULT_SAVED_PLANTS: [], handlePlantImageError() {}, SproutlyAccount: account },
     localStorage: {
       getItem: (key) => storage.has(key) ? storage.get(key) : null,

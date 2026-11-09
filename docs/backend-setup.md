@@ -16,6 +16,8 @@ Het Supabase-pakket wordt lokaal gebundeld zodat GitHub Pages geen npm-installat
 
 Voor wachtwoordherstel moet de volledige URL van `herstel.html` voor elke gebruikte omgeving bij Supabase onder **Authentication → URL Configuration → Redirect URLs** worden toegestaan. Stel ook de Site URL, e-mailprovider en het herstelmailtemplate correct in, zodat de link naar de toegestane redirect terugkeert. Test het aanvragen van een link, het instellen van een nieuw wachtwoord en een verlopen link met een eigen testaccount. De website geeft bewust geen bevestiging of een e-mailadres bestaat.
 
+De website gebruikt map-URL's zoals `planten/`, `plant/` en `herstel/`, ook bij een GitHub Pages-projectpad. De oorspronkelijke `.html`-adressen blijven bruikbaar voor bestaande bladwijzers en herstelmails. Na wijzigingen aan een van de vijf oorspronkelijke pagina's moet `npm run build:pages` worden uitgevoerd en moeten de gegenereerde `index.html`-bestanden worden meegecommit. De herstelmail gebruikt voorlopig bewust nog de oorspronkelijke `herstel.html`-redirect, zodat bestaande Supabase-instellingen en reeds verstuurde links blijven werken.
+
 ## Lokale Node-server
 
 ## Vereisten

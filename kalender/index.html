@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <base href="../" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Plan en bekijk je verzorgingsmomenten in de Sproutly-verzorgingskalender." />
+  <title>Verzorgingskalender | Sproutly</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f7259'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='38' fill='white'%3E✦%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="sub-page">
+  <a class="skip-link" href="kalender/#page-main">Ga naar hoofdinhoud</a>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Sproutly startpagina"><span class="brand-mark" aria-hidden="true">✦</span><span>sproutly</span></a>
+      <nav class="main-nav" aria-label="Hoofdnavigatie">
+        <a href="./">Ontdek</a><a href="planten/">Alle planten</a><a href="mijn-planten/">Mijn planten <span class="nav-count" id="nav-count">0</span></a><a class="active" href="kalender/">Verzorgingskalender</a>
+      </nav>
+      <div class="header-actions">
+        <a class="icon-button notification-button" href="kalender/" aria-label="Bekijk verzorgingskalender">
+          <span aria-hidden="true">♧</span>
+          <i></i>
+        </a>
+        <a class="profile-button" href="mijn-planten/" aria-label="Open Mijn planten">
+          <span class="avatar">SP</span>
+          <span class="profile-name">Inloggen</span>
+          <span class="chevron" aria-hidden="true">⌄</span>
+        </a>
+      </div>
+    </header>
+    <main id="page-main">
+      <section class="page-intro">
+        <p class="eyebrow">Overzicht</p>
+        <h1>Jouw verzorgings-<br /><em>kalender.</em></h1>
+        <p>Een rustig overzicht van de kleine momenten die je planten helpen groeien.</p>
+      </section>
+      <section class="calendar-section standalone-calendar" aria-labelledby="calendar-title">
+        <div class="section-heading"><div><p class="eyebrow">Deze maand</p><h2 id="calendar-title">Verzorgingsmomenten</h2><p class="calendar-summary" id="calendar-summary" aria-live="polite"></p></div><div class="calendar-controls"><button class="calendar-nav" id="previous-month" type="button" aria-label="Vorige maand">←</button><strong id="calendar-month"></strong><button class="calendar-nav" id="next-month" type="button" aria-label="Volgende maand">→</button></div></div>
+        <p class="calendar-guidance">Een stip betekent dat een plant aandacht kan gebruiken. De planning volgt je logboek; zonder eerdere registratie begint de controle vandaag. Voel eerst of de aarde droog is: een controle betekent niet automatisch water geven. Afvinken registreert de actie op vandaag.</p>
+        <div class="calendar-layout"><div class="calendar-card"><div class="calendar-weekdays" aria-hidden="true"><span>Ma</span><span>Di</span><span>Wo</span><span>Do</span><span>Vr</span><span>Za</span><span>Zo</span></div><div class="calendar-grid" id="calendar-grid"></div></div><aside class="calendar-day-card" aria-live="polite"><p class="eyebrow">Geselecteerde dag</p><h3 id="selected-date">Vandaag</h3><div id="selected-day-events"></div></aside></div>
+      </section>
+      <section class="newsletter-card page-callout"><div><p class="eyebrow">Een zachte herinnering</p><h2>Kleine stappen maken<br /><em>gelukkige planten.</em></h2></div><p>Controleer of deze browser meldingen ondersteunt. Automatische verzorgingsmeldingen zijn nog niet beschikbaar.</p><button class="outline-button" id="reminder-button" type="button">Browsermeldingen controleren</button><p class="reminder-status" id="reminder-status" role="status" aria-live="polite"></p></section>
+    </main>
+    <footer class="site-footer"><span>© <span class="page-year">2026</span> Sproutly · <a href="./#privacy">Privacy</a></span><span>Gemaakt voor nieuwsgierige kwekers <span aria-hidden="true">♡</span></span></footer>
+  </div>
+  <div class="toast" id="page-toast" role="status" aria-live="polite"></div>
+  <script src="plantencollectie.js"></script>
+  <script src="plant-instances.js"></script>
+  <script src="care-schedule.js"></script>
+  <script src="assets/supabase-client.js"></script>
+  <script src="account.js"></script>
+  <script src="pagina.js"></script>
+</body>
+</html>

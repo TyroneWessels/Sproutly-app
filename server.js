@@ -224,13 +224,23 @@ function contentType(filePath) {
 
 async function serveStatic(request, response, pathname) {
   const relativePath = pathname === "/" ? "index.html" : pathname.slice(1);
-  const filePath = path.resolve(rootDirectory, relativePath);
+  let filePath = path.resolve(rootDirectory, relativePath);
   const relativeToRoot = path.relative(rootDirectory, filePath);
   if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
     sendError(response, 404, "Niet gevonden.");
     return;
   }
   try {
+    const stat = await fs.stat(filePath);
+    if (stat.isDirectory()) {
+      if (!pathname.endsWith("/")) {
+        const requestUrl = new URL(request.url, "http://localhost");
+        response.writeHead(308, { Location: `${pathname}/${requestUrl.search}` });
+        response.end();
+        return;
+      }
+      filePath = path.join(filePath, "index.html");
+    }
     const file = await fs.readFile(filePath);
     response.writeHead(200, {
       "Content-Type": contentType(filePath),

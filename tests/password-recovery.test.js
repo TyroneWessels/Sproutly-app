@@ -27,7 +27,7 @@ function setup(hash = "") {
   const location = { href: "https://example.test/Sproutly-app/herstel.html" + hash, pathname: "/Sproutly-app/herstel.html", hash };
   const history = { replaceState(...args) { calls.push(["history", ...args]); } };
   vm.runInNewContext(source, {
-    window: { SproutlyAccount: account }, document: { querySelector: (id) => elements.get(id) },
+    window: { SproutlyAccount: account }, document: { querySelector: (id) => elements.get(id), baseURI: "https://example.test/Sproutly-app/" },
     location, history, URL, URLSearchParams, console: { error() {} }
   });
   return { elements, calls, recover: () => recovery() };

@@ -15,7 +15,7 @@
     const link = document.querySelector("a.profile-button");
     if (!link) return;
     const name = user?.displayName || "Inloggen";
-    link.href = "index.html?account=1";
+    link.href = "./?account=1";
     link.setAttribute("aria-label", user ? `Account van ${name}` : "Inloggen of account maken");
     link.querySelector(".profile-name").textContent = name;
     link.querySelector(".avatar").textContent = user ? name.trim().slice(0, 2).toUpperCase() : "SP";

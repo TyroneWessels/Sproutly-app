@@ -11,7 +11,7 @@
   }
 
   function url(name, id) {
-    return `plant.html?naam=${encodeURIComponent(name)}&id=${encodeURIComponent(id)}`;
+    return `plant/?naam=${encodeURIComponent(name)}&id=${encodeURIComponent(id)}`;
   }
 
   function label(id, saved, profiles) {

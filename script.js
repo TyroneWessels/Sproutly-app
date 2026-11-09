@@ -546,11 +546,11 @@ function renderPlants(query = "") {
   plantGrid.innerHTML = sortedPlants.map((plant) => `
     <article class="plant-card">
       <button class="save-plant" data-save="${plant.name}" aria-label="Voeg een ${plant.name} toe aan Mijn planten">+</button>
-      <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk details van ${plant.name}">
+      <a class="plant-art ${plant.art}" href="plant/?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk details van ${plant.name}">
         <img class="plant-photo" src="${plant.imageUrl}" alt="${plant.name}" loading="lazy" decoding="async" />
       </a>
       <span class="plant-tag">${plant.category}</span>
-      <h3><a href="plant.html?naam=${encodeURIComponent(plant.name)}">${plant.name}</a></h3>
+      <h3><a href="plant/?naam=${encodeURIComponent(plant.name)}">${plant.name}</a></h3>
       <p class="scientific-name">${plant.scientific}</p>
       <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
