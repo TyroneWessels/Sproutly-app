@@ -199,37 +199,26 @@ let activePlantName = "";
 let currentUser = null;
 let backendAvailable = false;
 let stateSyncTimer = null;
+let stateSyncPromise = Promise.resolve(true);
 let authMode = "login";
+let accountStatus = "loading";
 const gbifCache = new Map();
 
 async function apiRequest(path, options = {}) {
-  let response;
-  try {
-    response = await fetch(path, {
-      credentials: "same-origin",
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-      }
-    });
-  } catch (error) {
-    console.error(`Sproutly-server niet bereikbaar voor ${path}:`, error);
-    throw new Error("De accountserver is niet bereikbaar. Start Sproutly met `node .\\server.js` en open daarna http://localhost:3000.");
+  const account = window.SproutlyAccount;
+  if (path === "/api/health") return { ok: true };
+  if (path === "/api/auth/me") return { user: await account.getUser() };
+  if (path === "/api/auth/logout") return account.logout();
+  if (path === "/api/me") return account.deleteAccount();
+  if (path === "/api/me/state") {
+    return options.method === "PUT" ? account.saveState(JSON.parse(options.body)) : account.getState();
   }
-
-  notificationButton.addEventListener("click", () => document.querySelector("#reminder-button").click());
-  collectionMoreButton.addEventListener("click", () => {
-    document.querySelector("#my-plants").scrollIntoView({ behavior: "smooth", block: "start" });
-    showToast("Je collectie staat hieronder");
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    const error = new Error(payload.error || "De server kon het verzoek niet verwerken.");
-    error.status = response.status;
-    throw error;
+  const body = JSON.parse(options.body);
+  if (path === "/api/auth/register") {
+    return { user: await account.register(body.email, body.password, body.displayName, getClientState()) };
   }
-  return payload;
+  if (path === "/api/auth/login") return { user: await account.login(body.email, body.password, getClientState()) };
+  throw new Error("Onbekende accountactie.");
 }
 
 function getClientState() {
@@ -257,19 +246,25 @@ function renderAll() {
 }
 
 async function syncStateToServer() {
-  if (!currentUser) return;
+  if (!currentUser) return true;
   try {
     await apiRequest("/api/me/state", {
       method: "PUT",
       body: JSON.stringify(getClientState())
     });
+    return true;
+  } catch (error) {
+    console.error("Sproutly-data kon niet worden gesynchroniseerd:", error);
+    showToast(error.message || "Je wijzigingen konden niet naar de server worden opgeslagen");
+    return false;
+  }
+}
 
     exportDataButton.addEventListener("click", async () => {
       if (!currentUser) return;
       try {
-        const response = await fetch("/api/me/export", { credentials: "same-origin" });
-        if (!response.ok) throw new Error("Exporteren van je gegevens is mislukt.");
-        const blob = await response.blob();
+        const accountState = await window.SproutlyAccount.getState();
+        const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), user: currentUser, state: accountState }, null, 2)], { type: "application/json" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "sproutly-export.json";
@@ -285,12 +280,8 @@ async function syncStateToServer() {
       if (!currentUser || !window.confirm("Weet je zeker dat je account en alle servergegevens wilt verwijderen?")) return;
       try {
         await apiRequest("/api/me", { method: "DELETE" });
-        clearStoredLocalState();
         currentUser = null;
-        savedPlants = new Set();
-        completedTasks = new Set();
-        plantProfiles = {};
-        careOverrides = {};
+        restoreLocalState();
         updateAccountUi();
         renderAll();
         closeAuthModal();
@@ -303,20 +294,22 @@ async function syncStateToServer() {
     clearLocalDataButton.addEventListener("click", () => {
       if (!window.confirm("Lokale planten en verzorgingsgegevens op deze browser wissen?")) return;
       clearStoredLocalState();
-      savedPlants = new Set();
-      completedTasks = new Set();
-      plantProfiles = {};
-      careOverrides = {};
-      renderAll();
+      if (!currentUser) {
+        savedPlants = new Set();
+        completedTasks = new Set();
+        plantProfiles = {};
+        careOverrides = {};
+        renderAll();
+      }
       showToast("Lokale browsergegevens zijn gewist");
     });
 
-    document.querySelector("#current-year").textContent = String(new Date().getFullYear());
-  } catch (error) {
-    console.error("Sproutly-data kon niet worden gesynchroniseerd:", error);
-    showToast("Je wijzigingen konden niet naar de server worden opgeslagen");
-  }
-}
+document.querySelector("#current-year").textContent = String(new Date().getFullYear());
+notificationButton.addEventListener("click", () => document.querySelector("#reminder-button").click());
+collectionMoreButton.addEventListener("click", () => {
+  document.querySelector("#my-plants").scrollIntoView({ behavior: "smooth", block: "start" });
+  showToast("Je collectie staat hieronder");
+});
 
 function updateAccountUi() {
   if (currentUser) {
@@ -350,7 +343,7 @@ function setAuthMode(mode) {
 function openAuthModal() {
   setAuthMode(currentUser ? "login" : authMode);
   if (!backendAvailable && !currentUser) {
-    authStatus.textContent = "Accounts werken via de Sproutly-server. Start `node .\\server.js` en open http://localhost:3000.";
+    authStatus.textContent = "De accountverbinding is niet beschikbaar. Controleer je internetverbinding.";
   }
   authModal.hidden = false;
   (currentUser ? logoutButton : authEmail).focus();
@@ -380,8 +373,11 @@ async function initializeSession() {
     }
     updateAccountUi();
     if (currentUser) renderAll();
+    accountStatus = "ready";
   } catch (error) {
     if (error.status !== 401) console.error("Accountstatus kon niet worden geladen:", error);
+    accountStatus = "failed";
+    showToast("Accountgegevens laden mislukt. Vernieuw de pagina voordat je wijzigingen maakt.");
     updateAccountUi();
   }
 }
@@ -629,7 +625,10 @@ function escapeHtml(value) {
 function saveState() {
   if (currentUser) {
     window.clearTimeout(stateSyncTimer);
-    stateSyncTimer = window.setTimeout(syncStateToServer, 150);
+    stateSyncTimer = window.setTimeout(() => {
+      stateSyncTimer = null;
+      stateSyncPromise = stateSyncPromise.then((ok) => ok ? syncStateToServer() : false);
+    }, 150);
     return;
   }
   localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
@@ -640,6 +639,14 @@ function saveState() {
 
 function clearStoredLocalState() {
   ["sproutly-plants", "sproutly-tasks", "sproutly-profiles", "sproutly-care-overrides"].forEach((key) => localStorage.removeItem(key));
+}
+
+function restoreLocalState() {
+  const stored = localStorage.getItem("sproutly-plants");
+  savedPlants = new Set(stored ? JSON.parse(stored) : window.SPROUTLY_DEFAULT_SAVED_PLANTS);
+  completedTasks = new Set(JSON.parse(localStorage.getItem("sproutly-tasks") || "[]"));
+  plantProfiles = JSON.parse(localStorage.getItem("sproutly-profiles") || "{}");
+  careOverrides = JSON.parse(localStorage.getItem("sproutly-care-overrides") || "{}");
 }
 
 function renderCollection() {
@@ -1006,6 +1013,10 @@ document.querySelectorAll("[data-auth-mode]").forEach((tab) => {
 
 authForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (accountStatus !== "ready") {
+    authStatus.textContent = "De accountgegevens zijn nog niet beschikbaar. Vernieuw de pagina en probeer opnieuw.";
+    return;
+  }
   authStatus.textContent = authMode === "register" ? "Account wordt gemaakt…" : "Je wordt ingelogd…";
   authSubmit.disabled = true;
   try {
@@ -1032,15 +1043,24 @@ authForm.addEventListener("submit", async (event) => {
 
 logoutButton.addEventListener("click", async () => {
   try {
+    let pendingChange = false;
+    if (stateSyncTimer) {
+      window.clearTimeout(stateSyncTimer);
+      stateSyncTimer = null;
+      pendingChange = true;
+    }
+    if (!await stateSyncPromise || (pendingChange && !await syncStateToServer())) {
+      authStatus.textContent = "Niet alle wijzigingen zijn opgeslagen. Vernieuw de pagina voordat je uitlogt.";
+      return;
+    }
     if (backendAvailable) await apiRequest("/api/auth/logout", { method: "POST" });
   } catch (error) {
     console.error("Uitloggen mislukt:", error);
+    authStatus.textContent = "Uitloggen is mislukt. Controleer je verbinding en probeer opnieuw.";
+    return;
   }
   currentUser = null;
-  savedPlants = new Set();
-  completedTasks = new Set();
-  plantProfiles = {};
-  careOverrides = {};
+  restoreLocalState();
   updateAccountUi();
   renderAll();
   closeAuthModal();
@@ -1072,10 +1092,27 @@ document.addEventListener("keydown", (event) => {
   if (!authModal.hidden) trapModalFocus(event, authModal);
 });
 
+document.addEventListener("click", (event) => {
+  if (accountStatus === "ready") return;
+  if (!event.target.closest("[data-save], [data-task], [data-calendar-task], [data-snooze-task], [data-care-task], #modal-add, #clear-local-data-button")) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  showToast(accountStatus === "loading" ? "Je accountgegevens worden nog geladen." : "Accountgegevens laden mislukt. Vernieuw de pagina.");
+}, true);
+
+profileForm.addEventListener("submit", (event) => {
+  if (accountStatus === "ready") return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  showToast("Accountgegevens zijn niet beschikbaar. Vernieuw de pagina.");
+}, true);
+
 renderPlants();
 renderCollection();
 renderCarePlan();
 renderSeasonalGuidance();
 renderCalendar();
 updateAccountUi();
-initializeSession();
+initializeSession().then(() => {
+  if (new URLSearchParams(location.search).has("account")) openAuthModal();
+});

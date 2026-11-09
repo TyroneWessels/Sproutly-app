@@ -27,57 +27,51 @@ function updateNavCount() {
 }
 
 function persistLocalState() {
+  if (currentUser) return;
   localStorage.setItem(savedPlantsKey, JSON.stringify([...savedNames]));
   localStorage.setItem(completedTasksKey, JSON.stringify([...completedTasks]));
 }
 
 async function syncAccountState() {
-  if (!currentUser) return;
+  if (!currentUser) return true;
   accountState = {
     ...accountState,
     savedPlants: [...savedNames],
     completedTasks: [...completedTasks]
   };
   try {
-    const response = await fetch("/api/me/state", {
-      method: "PUT",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(accountState)
-    });
-    if (!response.ok) throw new Error(`Accountgegevens opslaan is mislukt (HTTP ${response.status}).`);
+    await window.SproutlyAccount.saveState(accountState);
+    return true;
   } catch (error) {
     console.error("Sproutly-accountgegevens konden niet worden opgeslagen:", error);
-    toast("Niet gesynchroniseerd met uw account. De wijziging staat wel op deze browser.");
+    toast(error.message || "De wijziging kon niet naar je account worden opgeslagen.");
+    return false;
   }
 }
 
 async function initializePageSession() {
   try {
-    const healthResponse = await fetch("/api/health");
-    if (!healthResponse.ok) throw new Error(`Servercontrole is mislukt (HTTP ${healthResponse.status}).`);
-    const sessionResponse = await fetch("/api/auth/me", { credentials: "same-origin" });
-    if (!sessionResponse.ok) throw new Error(`Accountcontrole is mislukt (HTTP ${sessionResponse.status}).`);
-    const session = await sessionResponse.json();
-    if (!session.user) return;
-    const stateResponse = await fetch("/api/me/state", { credentials: "same-origin" });
-    if (!stateResponse.ok) throw new Error(`Collectie laden is mislukt (HTTP ${stateResponse.status}).`);
-    const state = await stateResponse.json();
+    const user = await window.SproutlyAccount.getUser();
+    if (!user) return true;
+    const state = await window.SproutlyAccount.getState();
     accountState = {
       savedPlants: Array.isArray(state.savedPlants) ? state.savedPlants : [],
       plantProfiles: state.plantProfiles && typeof state.plantProfiles === "object" ? state.plantProfiles : {},
       completedTasks: Array.isArray(state.completedTasks) ? state.completedTasks : [],
       careOverrides: state.careOverrides && typeof state.careOverrides === "object" ? state.careOverrides : {}
     };
-    currentUser = session.user;
+    currentUser = user;
     savedNames = new Set(accountState.savedPlants);
     completedTasks = new Set(accountState.completedTasks);
     persistLocalState();
     renderSavedPlants();
     updateNavCount();
     if (calendarGrid) renderCalendar();
+    return true;
   } catch (error) {
-    console.error("Accountgegevens konden niet worden geladen; lokale gegevens blijven beschikbaar:", error);
+    console.error("Accountgegevens konden niet worden geladen:", error);
+    toast("Accountgegevens laden is mislukt. Vernieuw de pagina voordat je wijzigingen maakt.");
+    return false;
   }
 }
 
@@ -100,6 +94,7 @@ function renderSavedPlants() {
   savedGrid.querySelectorAll(".plant-photo").forEach((image) => image.addEventListener("error", window.handlePlantImageError, { once: true }));
   savedGrid.querySelectorAll("[data-remove-plant]").forEach((button) => {
     button.addEventListener("click", async () => {
+      if (!await pageSession) return;
       const name = button.dataset.removePlant;
       savedNames.delete(name);
       persistLocalState();
@@ -165,13 +160,13 @@ if (calendarGrid) {
     `).join("") : `<p class="calendar-event muted">${savedNames.size ? "Geen controlemomenten gepland. Een rustige dag voor uw planten." : "Voeg eerst een plant toe aan Mijn planten. Dan ziet u hier de verzorgingsmomenten."}</p>`;
     eventContainer.querySelectorAll("[data-calendar-task]").forEach((button) => {
       button.addEventListener("click", async () => {
+        if (!await pageSession) return;
         const id = button.dataset.calendarTask;
         if (completedTasks.has(id)) completedTasks.delete(id);
         else completedTasks.add(id);
         persistLocalState();
         renderCalendar();
-        await syncAccountState();
-        toast(completedTasks.has(id) ? "Controlemoment afgerond." : "Controlemoment weer geopend.");
+        if (await syncAccountState()) toast(completedTasks.has(id) ? "Controlemoment afgerond." : "Controlemoment weer geopend.");
       });
     });
   }
@@ -239,4 +234,4 @@ reminderButton?.addEventListener("click", async () => {
 
 renderSavedPlants();
 updateNavCount();
-initializePageSession();
+const pageSession = initializePageSession();

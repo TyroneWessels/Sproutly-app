@@ -141,11 +141,7 @@ async function save(message, previousState) {
   renderLog();
   try {
     if (signedIn) {
-      const response = await fetch("/api/me/state", {
-        method: "PUT", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(state)
-      });
-      if (!response.ok) throw new Error(`Account opslaan mislukt (HTTP ${response.status}).`);
-      state = await response.json();
+      state = await window.SproutlyAccount.saveState(state);
     } else {
       localStorage.setItem("sproutly-plants", JSON.stringify(state.savedPlants));
       localStorage.setItem("sproutly-profiles", JSON.stringify(state.plantProfiles));
@@ -156,7 +152,7 @@ async function save(message, previousState) {
     console.error("Plantgegevens opslaan mislukt:", error);
     state = previousState;
     setStatus(signedIn
-      ? "Opslaan bij je account is mislukt. Controleer je verbinding en probeer het opnieuw."
+      ? error.message || "Opslaan bij je account is mislukt. Controleer je verbinding en probeer het opnieuw."
       : "Opslaan op deze browser is mislukt. Controleer of er voldoende opslagruimte beschikbaar is.");
     return false;
   } finally {
@@ -175,22 +171,21 @@ async function initialize() {
       completedTasks: JSON.parse(localStorage.getItem("sproutly-tasks") || "[]"),
       careOverrides: JSON.parse(localStorage.getItem("sproutly-care-overrides") || "{}")
     };
-    let sessionResponse;
-    try {
-      sessionResponse = await fetch("/api/auth/me", { credentials: "same-origin" });
-    } catch (error) {
-      console.error("De server is niet bereikbaar:", error);
-      ready = true;
-      setStatus("De server is niet bereikbaar. Wijzigingen worden alleen in deze browser bewaard en niet met een account gesynchroniseerd.");
-      renderProfile();
-      return;
+    if (!Array.isArray(state.savedPlants) || !state.plantProfiles || typeof state.plantProfiles !== "object"
+      || Array.isArray(state.plantProfiles) || !Array.isArray(state.completedTasks)
+      || !state.careOverrides || typeof state.careOverrides !== "object" || Array.isArray(state.careOverrides)) {
+      throw new Error("Ongeldige lokale plantgegevens.");
     }
-    if (!sessionResponse.ok) throw new Error(`Accountcontrole mislukt (HTTP ${sessionResponse.status}).`);
-    const session = await sessionResponse.json();
-    if (session.user) {
-      const response = await fetch("/api/me/state", { credentials: "same-origin" });
-      if (!response.ok) throw new Error(`Accountgegevens laden mislukt (HTTP ${response.status}).`);
-      state = await response.json();
+  } catch (error) {
+    console.error("Lokale plantgegevens laden mislukt:", error);
+    setStatus("De gegevens in deze browser konden niet worden gelezen. Ze zijn niet verwijderd of aangepast.");
+    return;
+  }
+
+  try {
+    const user = await window.SproutlyAccount.getUser();
+    if (user) {
+      state = await window.SproutlyAccount.getState();
       signedIn = true;
     }
     ready = true;
@@ -198,7 +193,7 @@ async function initialize() {
     renderProfile();
   } catch (error) {
     console.error("Plantgegevens laden mislukt:", error);
-    setStatus("Je gegevens konden niet worden geladen. Controleer of de Sproutly-server draait en laad de pagina opnieuw.");
+    setStatus("Je accountgegevens konden niet worden gecontroleerd of geladen. Controleer je verbinding en laad de pagina opnieuw; er is niets overschreven.");
   }
 }
 

@@ -35,8 +35,8 @@ function showCatalogToast(message) {
 }
 
 async function syncCatalogState() {
-  localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
   if (!currentUser) {
+    localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
     return;
   }
   accountState = {
@@ -44,43 +44,36 @@ async function syncCatalogState() {
     savedPlants: [...savedPlants],
   };
   try {
-    const response = await fetch("/api/me/state", {
-      method: "PUT",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(accountState)
-    });
-    if (!response.ok) throw new Error(`Opslaan is mislukt (HTTP ${response.status}).`);
+    await window.SproutlyAccount.saveState(accountState);
   } catch (error) {
     console.error("Collectie kon niet naar het account worden opgeslagen:", error);
-    showCatalogToast("De wijziging kon niet naar je account worden opgeslagen.");
+    showCatalogToast(error.message || "De wijziging kon niet naar je account worden opgeslagen.");
   }
 }
 
 async function initializeCatalogSession() {
   try {
-    const health = await fetch("/api/health");
-    backendAvailable = health.ok;
-    if (!backendAvailable) return;
-    const response = await fetch("/api/auth/me", { credentials: "same-origin" });
-    const session = await response.json();
-    currentUser = session.user;
-    if (currentUser) {
-      const stateResponse = await fetch("/api/me/state", { credentials: "same-origin" });
-      if (!stateResponse.ok) throw new Error(`Accountgegevens laden is mislukt (HTTP ${stateResponse.status}).`);
-      const state = await stateResponse.json();
+    const user = await window.SproutlyAccount.getUser();
+    backendAvailable = true;
+    if (user) {
+      const state = await window.SproutlyAccount.getState();
       accountState = {
         savedPlants: Array.isArray(state.savedPlants) ? state.savedPlants : [],
         plantProfiles: state.plantProfiles && typeof state.plantProfiles === "object" ? state.plantProfiles : {},
         completedTasks: Array.isArray(state.completedTasks) ? state.completedTasks : [],
         careOverrides: state.careOverrides && typeof state.careOverrides === "object" ? state.careOverrides : {}
       };
+      currentUser = user;
       savedPlants = new Set(accountState.savedPlants);
       updateNavCount();
       renderCatalog();
     }
+    return true;
   } catch (error) {
     backendAvailable = false;
+    console.error("Accountgegevens laden mislukt:", error);
+    showCatalogToast("Accountgegevens laden is mislukt. Vernieuw de pagina voordat je wijzigingen maakt.");
+    return false;
   }
 }
 
@@ -136,6 +129,7 @@ document.querySelectorAll("[data-catalog-filter]").forEach((button) => {
 catalogGrid.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-catalog-save]");
   if (!button) return;
+  if (!await catalogSession) return;
   const name = button.dataset.catalogSave;
   if (savedPlants.has(name)) {
     savedPlants.delete(name);
@@ -150,4 +144,4 @@ catalogGrid.addEventListener("click", async (event) => {
 
 document.querySelector("#catalog-year").textContent = String(new Date().getFullYear());
 renderCatalog();
-initializeCatalogSession();
+const catalogSession = initializeCatalogSession();
