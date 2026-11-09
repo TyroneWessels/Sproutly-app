@@ -4,7 +4,12 @@ const storedPlants = localStorage.getItem(savedPlantsKey);
 let savedNames = new Set(storedPlants ? JSON.parse(storedPlants) : window.SPROUTLY_DEFAULT_SAVED_PLANTS);
 let completedTasks = new Set(JSON.parse(localStorage.getItem(completedTasksKey) || "[]"));
 let currentUser = null;
-let accountState = { savedPlants: [...savedNames], plantProfiles: {}, completedTasks: [...completedTasks], careOverrides: {} };
+let accountState = {
+  savedPlants: [...savedNames],
+  plantProfiles: JSON.parse(localStorage.getItem("sproutly-profiles") || "{}"),
+  completedTasks: [...completedTasks],
+  careOverrides: JSON.parse(localStorage.getItem("sproutly-care-overrides") || "{}")
+};
 const catalogPlants = window.SPROUTLY_PLANTS || [];
 
 if (!storedPlants) localStorage.setItem(savedPlantsKey, JSON.stringify([...savedNames]));
@@ -28,8 +33,12 @@ function updateNavCount() {
 
 function persistLocalState() {
   if (currentUser) return;
-  localStorage.setItem(savedPlantsKey, JSON.stringify([...savedNames]));
-  localStorage.setItem(completedTasksKey, JSON.stringify([...completedTasks]));
+  window.SproutlyPlants.writeLocal({
+    "sproutly-profiles": accountState.plantProfiles,
+    [savedPlantsKey]: [...savedNames],
+    [completedTasksKey]: [...completedTasks],
+    "sproutly-care-overrides": accountState.careOverrides
+  });
 }
 
 async function syncAccountState() {
@@ -77,17 +86,23 @@ async function initializePageSession() {
 
 function renderSavedPlants() {
   if (!savedGrid) return;
-  const plants = [...savedNames].map((name) => catalogPlants.find((plant) => plant.name === name)).filter(Boolean);
+  const plants = [...savedNames].map((id) => {
+    const name = window.SproutlyPlants.species(id, accountState.plantProfiles);
+    const plant = catalogPlants.find((item) => item.name === name);
+    return plant ? { ...plant, instanceId: id, profile: accountState.plantProfiles[id] || {}, displayName: window.SproutlyPlants.label(id, savedNames, accountState.plantProfiles) } : null;
+  }).filter(Boolean);
   emptyState.hidden = plants.length > 0;
   savedGrid.innerHTML = plants.map((plant) => `
     <article class="plant-card catalog-card">
-      <button class="save-plant saved" type="button" data-remove-plant="${plant.name}" aria-label="Verwijder ${plant.name} uit Mijn planten">Verwijderen</button>
-      <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk ${plant.name}"><img class="plant-photo" src="${plant.image}" alt="${plant.name}" loading="lazy" decoding="async" /></a>
+      <button class="save-plant saved" type="button" data-remove-plant="${window.SproutlyPlants.escape(plant.instanceId)}" aria-label="Verwijder ${window.SproutlyPlants.escape(plant.displayName)} uit Mijn planten">Verwijderen</button>
+      <a class="plant-art ${plant.art}" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}" aria-label="Bekijk ${window.SproutlyPlants.escape(plant.displayName)}"><img class="plant-photo" src="${window.SproutlyPlants.escape(plant.profile.photo || plant.image)}" alt="${plant.name}" loading="lazy" decoding="async" /></a>
       <span class="plant-tag">${plant.category}</span>
-      <h3><a href="plant.html?naam=${encodeURIComponent(plant.name)}">${plant.name}</a></h3>
+      <h3><a href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}">${window.SproutlyPlants.escape(plant.displayName)}</a></h3>
+      ${plant.profile.customName ? `<p class="catalog-card-meta">${window.SproutlyPlants.escape(plant.name)}</p>` : ""}
+      ${plant.profile.location ? `<p class="catalog-card-meta">${window.SproutlyPlants.escape(plant.profile.location)}</p>` : ""}
       <p class="scientific-name">${plant.scientific}</p>
       <p class="catalog-card-meta">${plant.light} · ${plant.difficulty === "easy" ? "Makkelijk" : "Gemiddeld"}</p>
-      <a class="plant-details-link" href="plant.html?naam=${encodeURIComponent(plant.name)}">Bekijk plant en verzorging →</a>
+      <a class="plant-details-link" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}">Bekijk plant en verzorging →</a>
       <div class="plant-card-links"><a class="image-credit" href="${plant.imageSource}" target="_blank" rel="noreferrer">Fotobron en licentie</a></div>
     </article>
   `).join("");
@@ -95,20 +110,47 @@ function renderSavedPlants() {
   savedGrid.querySelectorAll("[data-remove-plant]").forEach((button) => {
     button.addEventListener("click", async () => {
       if (!await pageSession) return;
-      const name = button.dataset.removePlant;
-      savedNames.delete(name);
-      persistLocalState();
+      const id = button.dataset.removePlant;
+      const name = window.SproutlyPlants.label(id, savedNames, accountState.plantProfiles);
+      if (!window.confirm(`Wil je ${name} verwijderen? De gegevens en het verzorgingslogboek van deze plant worden ook verwijderd.`)) return;
+      button.disabled = true;
+      const previousState = structuredClone(accountState);
+      const previousNames = new Set(savedNames);
+      const previousTasks = new Set(completedTasks);
+      savedNames.delete(id);
+      delete accountState.plantProfiles[id];
+      const belongsToPlant = (taskId) => taskId.startsWith(`calendar-${id}-`) || taskId.startsWith(`soil-check-${id}-`);
+      completedTasks = new Set([...completedTasks].filter((taskId) => !belongsToPlant(taskId)));
+      Object.keys(accountState.careOverrides).filter(belongsToPlant).forEach((taskId) => delete accountState.careOverrides[taskId]);
+      try {
+        persistLocalState();
+      } catch (error) {
+        console.error("Plant verwijderen mislukt:", error);
+        toast("Verwijderen is mislukt. Controleer de opslagruimte en probeer opnieuw.");
+        savedNames = previousNames;
+        completedTasks = previousTasks;
+        accountState = previousState;
+        button.disabled = false;
+        return;
+      }
+      if (!await syncAccountState()) {
+        savedNames = previousNames;
+        completedTasks = previousTasks;
+        accountState = previousState;
+        button.disabled = false;
+        return;
+      }
       updateNavCount();
       renderSavedPlants();
       if (calendarGrid) renderCalendar();
       toast(`${name} is verwijderd uit Mijn planten.`);
-      await syncAccountState();
     });
   });
 }
 
 const calendarGrid = document.querySelector("#calendar-grid");
 if (calendarGrid) {
+  let calendarSaving = false;
   let visibleMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   let selectedDate = new Date();
   const monthNames = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
@@ -122,24 +164,7 @@ if (calendarGrid) {
   }
 
   function getCareEvents() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const events = [];
-    catalogPlants.filter((plant) => savedNames.has(plant.name)).forEach((plant) => {
-      const interval = plant.soilCheckDays;
-      for (let offset = interval; offset <= 365; offset += interval) {
-        const date = new Date(today);
-        date.setDate(date.getDate() + offset);
-        const id = `soil-check-${plant.name}-${dateKey(date)}`;
-        events.push({
-          id,
-          date,
-          plant,
-          done: completedTasks.has(id)
-        });
-      }
-    });
-    return events;
+    return window.SproutlyCare.events(savedNames, accountState.plantProfiles, accountState.careOverrides);
   }
 
   function selectDate(date) {
@@ -150,23 +175,48 @@ if (calendarGrid) {
       month: "long",
       year: "numeric"
     });
-    const events = getCareEvents().filter((event) => dateKey(event.date) === dateKey(selectedDate));
+    const events = getCareEvents().filter((event) => event.date === dateKey(selectedDate));
     const eventContainer = document.querySelector("#selected-day-events");
     eventContainer.innerHTML = events.length ? events.map((event) => `
-      <button class="calendar-event ${event.done ? "complete" : ""}" type="button" data-calendar-task="${event.id}" aria-pressed="${event.done}">
-        <span class="calendar-event-check" aria-hidden="true">${event.done ? "✓" : "○"}</span>
-        <span><strong>${event.plant.name}</strong><small>${event.done ? "Aarde gecontroleerd" : "Controleer of de aarde droog is"}</small></span>
+      <button class="calendar-event" type="button" data-calendar-task="${window.SproutlyPlants.escape(event.taskId)}">
+        <span class="calendar-event-check" aria-hidden="true">○</span>
+        <span><strong>${window.SproutlyPlants.escape(event.plantName)}</strong><small>${window.SproutlyPlants.escape(event.title)}${event.overdue ? ` · gepland op ${event.dueDate}` : event.unplanned ? " · nog niet geregistreerd" : ""}</small></span>
       </button>
     `).join("") : `<p class="calendar-event muted">${savedNames.size ? "Geen controlemomenten gepland. Een rustige dag voor uw planten." : "Voeg eerst een plant toe aan Mijn planten. Dan ziet u hier de verzorgingsmomenten."}</p>`;
     eventContainer.querySelectorAll("[data-calendar-task]").forEach((button) => {
       button.addEventListener("click", async () => {
         if (!await pageSession) return;
-        const id = button.dataset.calendarTask;
-        if (completedTasks.has(id)) completedTasks.delete(id);
-        else completedTasks.add(id);
-        persistLocalState();
-        renderCalendar();
-        if (await syncAccountState()) toast(completedTasks.has(id) ? "Controlemoment afgerond." : "Controlemoment weer geopend.");
+        if (calendarSaving) {
+          toast("Wacht even tot het vorige moment is opgeslagen.");
+          return;
+        }
+        const event = getCareEvents().find((item) => item.taskId === button.dataset.calendarTask);
+        if (!event) {
+          toast("Dit verzorgingsmoment is gewijzigd. Vernieuw de pagina.");
+          return;
+        }
+        if (!window.confirm(`Heb je vandaag bij ${event.plantName} de actie "${event.action}" uitgevoerd? Dit wordt in het logboek opgeslagen.`)) return;
+        calendarSaving = true;
+        button.disabled = true;
+        const previous = structuredClone(accountState);
+        try {
+          window.SproutlyCare.record(accountState.plantProfiles, event);
+          persistLocalState();
+          if (!await syncAccountState()) {
+            accountState = previous;
+            button.disabled = false;
+            return;
+          }
+          renderCalendar();
+          toast(`${event.action} is voor vandaag in het logboek gezet.`);
+        } catch (error) {
+          accountState = previous;
+          button.disabled = false;
+          console.error("Verzorgingsmoment registreren mislukt:", error);
+          toast(error.message || "Het verzorgingsmoment kon niet worden opgeslagen.");
+        } finally {
+          calendarSaving = false;
+        }
       });
     });
   }
@@ -175,7 +225,10 @@ if (calendarGrid) {
     const year = visibleMonth.getFullYear();
     const month = visibleMonth.getMonth();
     const events = getCareEvents();
-    const monthEvents = events.filter((event) => event.date.getFullYear() === year && event.date.getMonth() === month);
+    const monthEvents = events.filter((event) => {
+      const date = window.SproutlyCare.parseDate(event.date);
+      return date.getFullYear() === year && date.getMonth() === month;
+    });
     document.querySelector("#calendar-month").textContent = `${monthNames[month]} ${year}`;
     document.querySelector("#calendar-summary").textContent = savedNames.size
       ? `${monthEvents.length} ${monthEvents.length === 1 ? "controlemoment" : "controlemomenten"} deze maand`
@@ -192,7 +245,7 @@ if (calendarGrid) {
       const key = dateKey(date);
       const isToday = key === todayKey;
       const isSelected = key === dateKey(selectedDate);
-      const dayEvents = events.filter((event) => dateKey(event.date) === key);
+      const dayEvents = events.filter((event) => event.date === key);
       const eventLabel = dayEvents.length ? `, ${dayEvents.length} ${dayEvents.length === 1 ? "verzorgingsmoment" : "verzorgingsmomenten"}` : ", geen verzorgingsmomenten";
       calendarGrid.insertAdjacentHTML("beforeend", `<button class="calendar-day ${isToday ? "today" : ""} ${isSelected ? "selected" : ""} ${dayEvents.length ? "has-event" : ""}" type="button" data-day="${day}" aria-label="${dayNames[date.getDay()]} ${day} ${monthNames[month]}${eventLabel}" aria-pressed="${isSelected}">${day}${dayEvents.length ? "<span class=\"calendar-dot\" aria-hidden=\"true\"></span>" : ""}</button>`);
     }

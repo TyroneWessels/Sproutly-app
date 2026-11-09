@@ -9,13 +9,14 @@ const catalogEmpty = document.querySelector("#catalog-empty");
 const catalogResultCount = document.querySelector("#catalog-result-count");
 const catalogToast = document.querySelector("#catalog-toast");
 let catalogFilter = "all";
+let catalogSaving = false;
 const storedPlants = localStorage.getItem("sproutly-plants");
 let savedPlants = new Set(storedPlants ? JSON.parse(storedPlants) : window.SPROUTLY_DEFAULT_SAVED_PLANTS);
 if (!storedPlants) localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
 let currentUser = null;
 let backendAvailable = false;
 const navCount = document.querySelector("#nav-count");
-let accountState = { savedPlants: [...savedPlants], plantProfiles: {}, completedTasks: [], careOverrides: {} };
+let accountState = { savedPlants: [...savedPlants], plantProfiles: JSON.parse(localStorage.getItem("sproutly-profiles") || "{}"), completedTasks: [], careOverrides: {} };
 
 function updateNavCount() {
   if (navCount) navCount.textContent = String(savedPlants.size);
@@ -36,8 +37,17 @@ function showCatalogToast(message) {
 
 async function syncCatalogState() {
   if (!currentUser) {
-    localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
-    return;
+    try {
+      window.SproutlyPlants.writeLocal({
+        "sproutly-profiles": accountState.plantProfiles,
+        "sproutly-plants": [...savedPlants]
+      });
+      return true;
+    } catch (error) {
+      console.error("Collectie kon niet op deze browser worden opgeslagen:", error);
+      showCatalogToast("De plant kon niet worden opgeslagen. Controleer de beschikbare opslagruimte.");
+      return false;
+    }
   }
   accountState = {
     ...accountState,
@@ -45,9 +55,11 @@ async function syncCatalogState() {
   };
   try {
     await window.SproutlyAccount.saveState(accountState);
+    return true;
   } catch (error) {
     console.error("Collectie kon niet naar het account worden opgeslagen:", error);
     showCatalogToast(error.message || "De wijziging kon niet naar je account worden opgeslagen.");
+    return false;
   }
 }
 
@@ -96,8 +108,8 @@ function renderCatalog() {
   updateNavCount();
   catalogGrid.innerHTML = sorted.map((plant) => `
     <article class="plant-card catalog-card">
-      <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" type="button" data-catalog-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Voeg toe"} ${plant.name}">
-        ${savedPlants.has(plant.name) ? "♥ Opgeslagen" : "♡ Aan mijn planten"}
+      <button class="save-plant" type="button" data-catalog-save="${plant.name}" aria-label="Voeg een ${plant.name} toe aan Mijn planten">
+        + Toevoegen
       </button>
       <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk ${plant.name}">
         <img class="plant-photo" src="${plant.image}" alt="${plant.name}" loading="lazy" decoding="async" />
@@ -130,16 +142,23 @@ catalogGrid.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-catalog-save]");
   if (!button) return;
   if (!await catalogSession) return;
-  const name = button.dataset.catalogSave;
-  if (savedPlants.has(name)) {
-    savedPlants.delete(name);
-    showCatalogToast(`${name} is verwijderd. Je collectie is bijgewerkt.`);
-  } else {
-    savedPlants.add(name);
-    showCatalogToast(`${name} is toegevoegd aan je planten.`);
+  if (catalogSaving) {
+    showCatalogToast("Wacht even tot de vorige plant is opgeslagen.");
+    return;
   }
+  catalogSaving = true;
+  const name = button.dataset.catalogSave;
+  button.disabled = true;
+  const id = window.SproutlyPlants.create(name, accountState.plantProfiles);
+  savedPlants.add(id);
+  if (await syncCatalogState()) {
+    showCatalogToast(`${name} is toegevoegd. Bekijk en geef je plant een naam via Mijn planten.`);
+  } else {
+    savedPlants.delete(id);
+    delete accountState.plantProfiles[id];
+  }
+  catalogSaving = false;
   renderCatalog();
-  await syncCatalogState();
 });
 
 document.querySelector("#catalog-year").textContent = String(new Date().getFullYear());

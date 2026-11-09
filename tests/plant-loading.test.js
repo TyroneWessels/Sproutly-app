@@ -3,8 +3,11 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { webcrypto } = require("node:crypto");
 
 const source = fs.readFileSync(path.join(__dirname, "..", "plant.js"), "utf8");
+const instances = fs.readFileSync(path.join(__dirname, "..", "plant-instances.js"), "utf8");
+const care = fs.readFileSync(path.join(__dirname, "..", "care-schedule.js"), "utf8");
 
 async function loadPage(account, storedPlants) {
   const elements = new Map();
@@ -13,7 +16,7 @@ async function loadPage(account, storedPlants) {
       elements.set(selector, {
         hidden: false, disabled: ["#add-plant", "#profile-fields", "#log-fields"].includes(selector), value: "", checked: false, textContent: "",
         handlers: {}, addEventListener(type, handler) { this.handlers[type] = handler; },
-        replaceChildren() {}, append() {}, removeAttribute() {}, setAttribute() {}
+        replaceChildren() {}, append() {}, removeAttribute() {}, setAttribute() {}, scrollIntoView() {}
       });
     }
     return elements.get(selector);
@@ -23,7 +26,8 @@ async function loadPage(account, storedPlants) {
   const document = { querySelector: element, createElement: () => element(Symbol()), title: "" };
   const plant = { name: "Monstera", category: "Binnenplant", scientific: "Monstera deliciosa", type: "Kamerplant", light: "Indirect licht", difficulty: "easy", soilCheckDays: 7, image: "plant.jpg", imageSource: "bron" };
   const context = {
-    document, location: { search: "?naam=Monstera" }, URLSearchParams, Date, JSON, Object, Array, String,
+    document, location: { search: "?naam=Monstera" }, history: { replaceState() {} },
+    URLSearchParams, Date, JSON, Object, Array, String, Uint8Array, crypto: webcrypto,
     window: { SPROUTLY_PLANTS: [plant], SPROUTLY_DEFAULT_SAVED_PLANTS: [], handlePlantImageError() {}, SproutlyAccount: account },
     localStorage: {
       getItem: (key) => storage.has(key) ? storage.get(key) : null,
@@ -31,6 +35,8 @@ async function loadPage(account, storedPlants) {
     },
     console: { error() {} }
   };
+  vm.runInNewContext(instances, context);
+  vm.runInNewContext(care, context);
   vm.runInNewContext(source, context);
   await new Promise((resolve) => setImmediate(resolve));
   return { element, storage };
@@ -41,7 +47,13 @@ test("signed-out visitor can save plants locally", async () => {
   assert.equal(element("#add-plant").disabled, false);
   assert.match(element("#plant-status").textContent, /op deze browser bewaard/);
   await element("#add-plant").handlers.click();
-  assert.deepEqual(JSON.parse(storage.get("sproutly-plants")), ["Monstera"]);
+  const [id] = JSON.parse(storage.get("sproutly-plants"));
+  assert.match(id, /^plant-[a-f0-9]{32}$/);
+  assert.equal(JSON.parse(storage.get("sproutly-profiles"))[id].species, "Monstera");
+  await element("#add-plant").handlers.click();
+  const ids = JSON.parse(storage.get("sproutly-plants"));
+  assert.equal(ids.length, 2);
+  assert.notEqual(ids[0], ids[1]);
 });
 
 test("account server error does not enable editing", async () => {

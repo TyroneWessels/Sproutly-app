@@ -528,6 +528,11 @@ h1 em, h2 em, h2 span { color: #a44f35; }
 .care-calendar-link:hover span:last-child { background: var(--green); color: #fff; }
 .detail-form input:not([type="checkbox"]), .detail-form textarea, .detail-form select { border-radius: 9px; }
 .detail-form button, .plant-detail-intro button { font-size: 16px; }
+.plant-instance-picker { display: grid; gap: 6px; max-width: 380px; margin-top: 20px; }
+.plant-instance-picker[hidden] { display: none; }
+.plant-instance-picker label { font-weight: 800; }
+.plant-instance-picker select { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid #829d8b; border-radius: 10px; background: #fffdf8; color: var(--ink); font: inherit; }
+.plant-instance-picker small { color: var(--muted); font-size: 14px; }
 .plant-status { border-left: 4px solid var(--green); border-radius: 4px 12px 12px 4px; }
 .newsletter-card { border: 1px solid #e8c9b3; border-radius: 24px 24px 24px 7px; background: url("assets/botanical-sprig.svg") no-repeat right 12px bottom 0 / 105px auto, linear-gradient(120deg, #f4ddcb, #f8ebd8); box-shadow: 0 8px 24px rgba(100, 72, 49, .07); }
 .newsletter-card > p { max-width: 270px; color: #634c43; font-size: 15px; }

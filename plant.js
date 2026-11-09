@@ -8,6 +8,8 @@ const personalSection = document.querySelector("#personal-section");
 const profileForm = document.querySelector("#detail-profile-form");
 const logForm = document.querySelector("#care-log-form");
 const logList = document.querySelector("#care-log-list");
+const plantPicker = document.querySelector("#plant-instance-picker");
+const plantSelect = document.querySelector("#plant-instance");
 const fields = {
   name: document.querySelector("#detail-name"),
   location: document.querySelector("#detail-location"),
@@ -20,10 +22,14 @@ const fields = {
   logNotes: document.querySelector("#log-notes")
 };
 
+const requestedId = new URLSearchParams(location.search).get("id");
+let selectedId = null;
 let state;
 let signedIn = false;
 let ready = false;
 let busy = false;
+let profileDirty = false;
+let logDirty = false;
 
 const descriptions = {
   "Monstera": "De monstera, ook wel gatenplant genoemd, is een kamerplant met grote bladeren waarin op latere leeftijd gaten kunnen ontstaan.",
@@ -69,10 +75,29 @@ function setStatus(message) {
   statusMessage.textContent = message;
 }
 
+function updatePlantSelector() {
+  const matches = state.savedPlants.filter((id) => window.SproutlyPlants.species(id, state.plantProfiles) === plant.name);
+  plantPicker.hidden = matches.length === 0;
+  plantSelect.replaceChildren();
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Kies een plant";
+  plantSelect.append(placeholder);
+  matches.forEach((id) => {
+    const profile = state.plantProfiles[id] || {};
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = `${window.SproutlyPlants.label(id, state.savedPlants, state.plantProfiles)}${profile.location ? ` · ${profile.location}` : ""}`;
+    plantSelect.append(option);
+  });
+  plantSelect.value = selectedId || "";
+}
+
 function updateControls() {
-  const saved = state && state.savedPlants.includes(plant.name);
-  addButton.disabled = !ready || busy || saved;
-  addButton.textContent = saved ? "Toegevoegd aan Mijn planten" : "Aan Mijn planten toevoegen";
+  const saved = state && selectedId && state.savedPlants.includes(selectedId);
+  addButton.disabled = !ready || busy;
+  plantSelect.disabled = !ready || busy;
+  addButton.textContent = saved ? "Nog een plant toevoegen" : "Een plant toevoegen";
   personalSection.hidden = !saved;
   profileFields.disabled = !ready || busy;
   logFields.disabled = !ready || busy;
@@ -81,7 +106,7 @@ function updateControls() {
 
 function renderLog() {
   logList.replaceChildren();
-  const entries = [...(state.plantProfiles[plant.name]?.careLog || [])].sort((a, b) => b.date.localeCompare(a.date));
+  const entries = [...(state.plantProfiles[selectedId]?.careLog || [])].sort((a, b) => b.date.localeCompare(a.date));
   if (!entries.length) {
     const empty = document.createElement("p");
     empty.textContent = "Je hebt nog geen verzorging toegevoegd.";
@@ -107,7 +132,7 @@ function renderLog() {
     remove.disabled = busy || !ready;
     remove.addEventListener("click", async () => {
       const previousState = JSON.parse(JSON.stringify(state));
-      const profile = state.plantProfiles[plant.name];
+      const profile = state.plantProfiles[selectedId];
       profile.careLog = profile.careLog.filter((item) => item.id !== entry.id);
       await save("De verzorging is uit het logboek verwijderd.", previousState);
     });
@@ -119,7 +144,8 @@ function renderLog() {
 }
 
 function renderProfile() {
-  const profile = state.plantProfiles[plant.name] || {};
+  const profile = state.plantProfiles[selectedId] || {};
+  document.querySelector("#profile-title").textContent = `Gegevens van ${selectedId ? window.SproutlyPlants.label(selectedId, state.savedPlants, state.plantProfiles) : plant.name}`;
   fields.name.value = profile.customName || "";
   fields.location.value = profile.location || "";
   fields.date.value = profile.date || "";
@@ -131,6 +157,7 @@ function renderProfile() {
   else preview.removeAttribute("src");
   document.querySelector("#remove-photo-label").hidden = !profile.photo;
   document.querySelector("#remove-photo").checked = false;
+  updatePlantSelector();
   renderLog();
   updateControls();
 }
@@ -143,8 +170,10 @@ async function save(message, previousState) {
     if (signedIn) {
       state = await window.SproutlyAccount.saveState(state);
     } else {
-      localStorage.setItem("sproutly-plants", JSON.stringify(state.savedPlants));
-      localStorage.setItem("sproutly-profiles", JSON.stringify(state.plantProfiles));
+      window.SproutlyPlants.writeLocal({
+        "sproutly-profiles": state.plantProfiles,
+        "sproutly-plants": state.savedPlants
+      });
     }
     setStatus(message);
     return true;
@@ -188,8 +217,14 @@ async function initialize() {
       state = await window.SproutlyAccount.getState();
       signedIn = true;
     }
+    const matches = state.savedPlants.filter((id) => window.SproutlyPlants.species(id, state.plantProfiles) === plant.name);
+    selectedId = requestedId && matches.includes(requestedId) ? requestedId : !requestedId && matches.length === 1 ? matches[0] : null;
+    if (requestedId && !selectedId) {
+      setStatus("Deze plant staat niet in Mijn planten. Kies een plant via Mijn planten of voeg een nieuwe toe.");
+    } else {
+      setStatus(signedIn ? "Je gegevens worden bij je account bewaard." : "Je gegevens worden op deze browser bewaard.");
+    }
     ready = true;
-    setStatus(signedIn ? "Je gegevens worden bij je account bewaard." : "Je gegevens worden op deze browser bewaard.");
     renderProfile();
   } catch (error) {
     console.error("Plantgegevens laden mislukt:", error);
@@ -225,11 +260,44 @@ if (!plant) {
   image.src = plant.image;
   document.querySelector("#plant-image-source").href = plant.imageSource;
   fields.logDate.value = localDate();
+  fields.logDate.max = localDate();
+
+  profileForm.addEventListener("input", () => { profileDirty = true; });
+  profileForm.addEventListener("change", () => { profileDirty = true; });
+  logForm.addEventListener("input", () => { logDirty = true; });
+  logForm.addEventListener("change", () => { logDirty = true; });
+  plantSelect.addEventListener("change", () => {
+    if (!plantSelect.value) {
+      plantSelect.value = selectedId || "";
+      return;
+    }
+    if ((profileDirty || logDirty) && !window.confirm("Je hebt niet-opgeslagen wijzigingen. Wil je toch een andere plant kiezen?")) {
+      plantSelect.value = selectedId || "";
+      return;
+    }
+    location.href = window.SproutlyPlants.url(plant.name, plantSelect.value);
+  });
 
   addButton.addEventListener("click", async () => {
+    if (!ready || busy) return;
+    if ((profileDirty || logDirty) && !window.confirm("Je hebt niet-opgeslagen wijzigingen. Wil je toch een nieuwe plant toevoegen?")) return;
     const previousState = JSON.parse(JSON.stringify(state));
-    if (!state.savedPlants.includes(plant.name)) state.savedPlants.push(plant.name);
-    await save(`${plant.name} is toegevoegd aan Mijn planten. Je kunt nu je gegevens invullen.`, previousState);
+    const previousId = selectedId;
+    selectedId = window.SproutlyPlants.create(plant.name, state.plantProfiles);
+    state.savedPlants.push(selectedId);
+    if (await save(`${plant.name} is toegevoegd aan Mijn planten. Geef deze plant hieronder een eigen naam.`, previousState)) {
+      history.replaceState(null, "", window.SproutlyPlants.url(plant.name, selectedId));
+      fields.photo.value = "";
+      fields.action.value = "";
+      fields.logNotes.value = "";
+      profileDirty = false;
+      logDirty = false;
+      renderProfile();
+      profileForm.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      selectedId = previousId;
+      renderProfile();
+    }
   });
 
   profileForm.addEventListener("submit", async (event) => {
@@ -239,7 +307,7 @@ if (!plant) {
       setStatus("Kies een afbeelding van maximaal 500 KB.");
       return;
     }
-    let photoData = document.querySelector("#remove-photo").checked ? "" : state.plantProfiles[plant.name]?.photo || "";
+    let photoData = document.querySelector("#remove-photo").checked ? "" : state.plantProfiles[selectedId]?.photo || "";
     if (photo) {
       try {
         photoData = await new Promise((resolve, reject) => {
@@ -255,20 +323,25 @@ if (!plant) {
       }
     }
     const previousState = JSON.parse(JSON.stringify(state));
-    state.plantProfiles[plant.name] = {
-      ...state.plantProfiles[plant.name],
+    state.plantProfiles[selectedId] = {
+      ...state.plantProfiles[selectedId],
       customName: fields.name.value.trim(), location: fields.location.value.trim(),
       date: fields.date.value, notes: fields.notes.value.trim(), favorite: fields.favorite.checked, photo: photoData
     };
     if (await save("Je plantgegevens zijn opgeslagen.", previousState)) {
       fields.photo.value = "";
+      profileDirty = false;
       renderProfile();
     }
   });
 
   logForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const profile = state.plantProfiles[plant.name] || {};
+    if (!window.SproutlyCare.parseDate(fields.logDate.value) || fields.logDate.value > localDate()) {
+      setStatus("Kies een geldige datum die niet in de toekomst ligt.");
+      return;
+    }
+    const profile = state.plantProfiles[selectedId] || {};
     const entries = profile.careLog || [];
     if (entries.length >= 200) {
       setStatus("Je logboek is vol. Verwijder eerst een oud verzorgingsmoment.");
@@ -276,13 +349,14 @@ if (!plant) {
     }
     const previousState = JSON.parse(JSON.stringify(state));
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    state.plantProfiles[plant.name] = {
+    state.plantProfiles[selectedId] = {
       ...profile,
       careLog: [{ id, date: fields.logDate.value, action: fields.action.value, notes: fields.logNotes.value.trim() }, ...entries]
     };
     if (await save("Het verzorgingsmoment is toegevoegd aan je logboek.", previousState)) {
       fields.action.value = "";
       fields.logNotes.value = "";
+      logDirty = false;
     }
   });
   initialize();

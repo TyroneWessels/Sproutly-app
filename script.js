@@ -124,17 +124,6 @@ plants.forEach((plant, index) => {
   plant.imageLicenseUrl = catalogPlant.imageSource;
 });
 
-const careSchedules = {
-  Monstera: { watering: 7, fertilizing: 28, repotting: 365 },
-  Basilicum: { watering: 3, fertilizing: 14, repotting: 180 },
-  Lavendel: { watering: 10, fertilizing: 90, repotting: 365 },
-  Sansevieria: { watering: 21, fertilizing: 60, repotting: 730 },
-  "Aloë vera": { watering: 21, fertilizing: 60, repotting: 730 },
-  Tomaat: { watering: 3, fertilizing: 7, repotting: 180 },
-  Rozemarijn: { watering: 10, fertilizing: 90, repotting: 365 },
-  "Pannenkoekenplant": { watering: 7, fertilizing: 28, repotting: 365 }
-};
-
 const plantGrid = document.querySelector("#plant-grid");
 const emptyState = document.querySelector("#empty-state");
 const searchInput = document.querySelector("#plant-search");
@@ -499,7 +488,7 @@ calendarGrid.addEventListener("click", (event) => {
   renderCalendar();
 });
 
-selectedDayEvents.addEventListener("click", (event) => {
+selectedDayEvents.addEventListener("click", async (event) => {
   const snoozeButton = event.target.closest("[data-snooze-task]");
   if (snoozeButton) {
     const taskId = snoozeButton.dataset.snoozeTask;
@@ -514,12 +503,7 @@ selectedDayEvents.addEventListener("click", (event) => {
   }
   const taskButton = event.target.closest("[data-calendar-task]");
   if (!taskButton) return;
-  const taskId = taskButton.dataset.calendarTask;
-  if (completedTasks.has(taskId)) completedTasks.delete(taskId);
-  else completedTasks.add(taskId);
-  saveState();
-  renderCalendar();
-  showToast(completedTasks.has(taskId) ? "Kalendertaak afgerond" : "Taak weer geopend");
+  await recordCareEvent(taskButton.dataset.calendarTask);
 });
 
 previousMonthButton.addEventListener("click", () => {
@@ -550,7 +534,7 @@ function renderPlants(query = "") {
   });
   plantGrid.innerHTML = sortedPlants.map((plant) => `
     <article class="plant-card">
-      <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" data-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Bewaar"} ${plant.name}">${savedPlants.has(plant.name) ? "♥" : "♡"}</button>
+      <button class="save-plant" data-save="${plant.name}" aria-label="Voeg een ${plant.name} toe aan Mijn planten">+</button>
       <a class="plant-art ${plant.art}" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk details van ${plant.name}">
         <img class="plant-photo" src="${plant.imageUrl}" alt="${plant.name}" loading="lazy" decoding="async" />
       </a>
@@ -629,12 +613,21 @@ function saveState() {
       stateSyncTimer = null;
       stateSyncPromise = stateSyncPromise.then((ok) => ok ? syncStateToServer() : false);
     }, 150);
-    return;
+    return true;
   }
-  localStorage.setItem("sproutly-plants", JSON.stringify([...savedPlants]));
-  localStorage.setItem("sproutly-tasks", JSON.stringify([...completedTasks]));
-  localStorage.setItem("sproutly-profiles", JSON.stringify(plantProfiles));
-  localStorage.setItem("sproutly-care-overrides", JSON.stringify(careOverrides));
+  try {
+    window.SproutlyPlants.writeLocal({
+      "sproutly-plants": [...savedPlants],
+      "sproutly-tasks": [...completedTasks],
+      "sproutly-profiles": plantProfiles,
+      "sproutly-care-overrides": careOverrides
+    });
+    return true;
+  } catch (error) {
+    console.error("Browsergegevens opslaan mislukt:", error);
+    showToast("Opslaan is mislukt. Controleer de beschikbare opslagruimte.");
+    return false;
+  }
 }
 
 function clearStoredLocalState() {
@@ -650,11 +643,11 @@ function restoreLocalState() {
 }
 
 function renderCollection() {
-  const saved = window.SPROUTLY_PLANTS.filter((plant) => savedPlants.has(plant.name)).map((plant) => ({
-    ...plant,
-    ...plants.find((item) => item.name === plant.name),
-    imageUrl: plant.image
-  }));
+  const saved = [...savedPlants].map((id) => {
+    const name = window.SproutlyPlants.species(id, plantProfiles);
+    const plant = window.SPROUTLY_PLANTS.find((item) => item.name === name);
+    return plant ? { ...plant, ...plants.find((item) => item.name === name), imageUrl: plant.image, instanceId: id, displayName: window.SproutlyPlants.label(id, savedPlants, plantProfiles) } : null;
+  }).filter(Boolean);
   collectionCount.textContent = `${saved.length} ${saved.length === 1 ? "groene vriend" : "groene vrienden"}`;
   navCount.textContent = String(savedPlants.size);
   if (!saved.length) {
@@ -666,9 +659,9 @@ function renderCollection() {
     return;
   }
   collectionList.innerHTML = saved.map((plant) => `
-    <a class="collection-item" href="plant.html?naam=${encodeURIComponent(plant.name)}" aria-label="Bekijk ${escapeHtml(plantProfiles[plant.name]?.customName || plant.name)}">
-      <img class="mini-plant" src="${plantProfiles[plant.name]?.photo || plant.imageUrl}" alt="" loading="lazy" decoding="async" />
-      <span><strong>${escapeHtml(plantProfiles[plant.name]?.customName || plant.name)}</strong><small>${escapeHtml(plantProfiles[plant.name]?.location || plant.scientific)}</small></span>
+    <a class="collection-item" href="${window.SproutlyPlants.url(plant.name, plant.instanceId)}" aria-label="Bekijk ${escapeHtml(plant.displayName)}">
+      <img class="mini-plant" src="${escapeHtml(plantProfiles[plant.instanceId]?.photo || plant.imageUrl)}" alt="" loading="lazy" decoding="async" />
+      <span><strong>${escapeHtml(plant.displayName)}</strong><small>${escapeHtml(plantProfiles[plant.instanceId]?.location || plant.scientific)}</small></span>
       <span class="status-pill ${plant.statusClass || "status-good"}">${plant.status || "Bekijk je plant"}</span>
     </a>
   `).join("");
@@ -729,32 +722,53 @@ function addDays(date, amount) {
 }
 
 function getCalendarEvents() {
-  const today = new Date();
-  const events = [];
-  plants.filter((plant) => savedPlants.has(plant.name)).forEach((plant) => {
-    const schedule = careSchedules[plant.name];
-    if (!schedule) return;
-    [
-      ["watering", "Water geven"],
-      ["fertilizing", "Bemesten"],
-      ["repotting", "Verpotten"]
-    ].forEach(([type, title]) => {
-      const startOffset = type === "watering" && plant.statusClass === "status-today" ? 0 : schedule[type];
-      for (let offset = startOffset; offset <= 365; offset += schedule[type]) {
-        const date = addDays(today, offset);
-        const baseTaskId = `calendar-${plant.name}-${type}-${getDateKey(date)}`;
-        const overriddenDate = careOverrides[baseTaskId] ? parseDateKey(careOverrides[baseTaskId]) : date;
-        events.push({
-          date: getDateKey(overriddenDate),
-          taskId: baseTaskId,
-          title,
-          plantName: plantProfiles[plant.name]?.customName || plant.name,
-          done: completedTasks.has(baseTaskId)
-        });
+  return window.SproutlyCare.events(savedPlants, plantProfiles, careOverrides);
+}
+
+async function recordCareEvent(taskId) {
+  if (accountStatus !== "ready") return;
+  accountStatus = "saving";
+  try {
+    if (currentUser) {
+      const pending = Boolean(stateSyncTimer);
+      if (pending) {
+        window.clearTimeout(stateSyncTimer);
+        stateSyncTimer = null;
       }
-    });
-  });
-  return events;
+      if (!await stateSyncPromise || (pending && !await syncStateToServer())) {
+        showToast("Eerdere wijzigingen zijn niet opgeslagen. Vernieuw de pagina.");
+        return;
+      }
+    }
+    const event = getCalendarEvents().find((item) => item.taskId === taskId);
+    if (!event) {
+      showToast("Dit verzorgingsmoment is gewijzigd. Vernieuw de pagina.");
+      return;
+    }
+    if (!window.confirm(`Heb je vandaag bij ${event.plantName} de actie "${event.action}" uitgevoerd? Dit wordt in het logboek opgeslagen.`)) return;
+    const previousProfiles = structuredClone(plantProfiles);
+    try {
+      window.SproutlyCare.record(plantProfiles, event);
+      if (currentUser) {
+        if (!await syncStateToServer()) {
+          plantProfiles = previousProfiles;
+          return;
+        }
+      } else if (!saveState()) {
+        plantProfiles = previousProfiles;
+        return;
+      }
+      renderCarePlan();
+      renderCalendar();
+      showToast(`${event.action} is voor vandaag in het logboek gezet.`);
+    } catch (error) {
+      plantProfiles = previousProfiles;
+      console.error("Verzorgingsmoment registreren mislukt:", error);
+      showToast(error.message || "Het verzorgingsmoment kon niet worden opgeslagen.");
+    }
+  } finally {
+    accountStatus = "ready";
+  }
 }
 
 function parseDateKey(dateKey) {
@@ -773,7 +787,7 @@ function renderSelectedCalendarDay(events) {
   selectedDayEvents.innerHTML = selectedEvents.length ? selectedEvents.map((event) => `
     <button class="calendar-event ${event.done ? "complete" : ""}" data-calendar-task="${event.taskId}">
       <span class="calendar-event-check">${event.done ? "✓" : "○"}</span>
-      <span><strong>${escapeHtml(event.plantName)}</strong><small>${escapeHtml(event.title)}</small></span>
+      <span><strong>${escapeHtml(event.plantName)}</strong><small>${escapeHtml(event.title)}${event.overdue ? ` · gepland op ${escapeHtml(event.dueDate)}` : event.unplanned ? " · nog niet geregistreerd" : ""}</small></span>
     </button>
     <div class="calendar-event-actions">
       <button type="button" data-snooze-task="${event.taskId}" data-snooze-days="1">+1 dag</button>
@@ -820,8 +834,9 @@ function showToast(message) {
 }
 
 function openPlant(plant) {
-  activePlantName = plant.name;
-  const profile = plantProfiles[plant.name] || {};
+  const matches = [...savedPlants].filter((id) => window.SproutlyPlants.species(id, plantProfiles) === plant.name);
+  activePlantName = matches.length === 1 ? matches[0] : "";
+  const profile = plantProfiles[activePlantName] || {};
   document.querySelector("#modal-category").textContent = plant.category;
   document.querySelector("#modal-title").textContent = plant.name;
   document.querySelector("#modal-scientific").textContent = plant.scientific;
@@ -848,8 +863,8 @@ function openPlant(plant) {
   profileNotes.value = profile.notes || "";
   profileFavorite.checked = Boolean(profile.favorite);
   profilePhoto.value = "";
-  profileForm.hidden = !savedPlants.has(plant.name);
-  document.querySelector("#modal-add").hidden = savedPlants.has(plant.name);
+  profileForm.hidden = !activePlantName;
+  document.querySelector("#modal-add").hidden = false;
   const illustration = document.querySelector("#modal-illustration");
   illustration.className = `modal-illustration ${plant.art}`;
   illustration.innerHTML = `<img class="plant-photo" src="${plant.imageUrl}" alt="${plant.name}" decoding="async" />`;
@@ -892,14 +907,14 @@ plantGrid.addEventListener("click", (event) => {
   const saveButton = event.target.closest("[data-save]");
   if (saveButton) {
     const name = saveButton.dataset.save;
-    if (savedPlants.has(name)) {
-      savedPlants.delete(name);
-      showToast(`${name} is verwijderd uit je planten`);
-    } else {
-      savedPlants.add(name);
-      showToast(`${name} is toegevoegd aan je planten`);
+    const id = window.SproutlyPlants.create(name, plantProfiles);
+    savedPlants.add(id);
+    if (!saveState()) {
+      savedPlants.delete(id);
+      delete plantProfiles[id];
+      return;
     }
-    saveState();
+    showToast(`${name} is toegevoegd. Geef je plant een naam via Mijn planten.`);
     renderPlants(searchInput.value);
     renderCollection();
     renderCarePlan();
@@ -915,14 +930,20 @@ modal.addEventListener("click", (event) => { if (event.target === modal) modal.h
 
 document.querySelector("#modal-add").addEventListener("click", () => {
   const name = document.querySelector("#modal-title").textContent;
-  savedPlants.add(name);
+  activePlantName = window.SproutlyPlants.create(name, plantProfiles);
+  savedPlants.add(activePlantName);
   saveState();
   renderPlants(searchInput.value);
   renderCollection();
   renderCarePlan();
   renderCalendar();
   profileForm.hidden = false;
-  document.querySelector("#modal-add").hidden = true;
+  profileName.value = "";
+  profileLocation.value = "";
+  profileDate.value = "";
+  profileNotes.value = "";
+  profileFavorite.checked = false;
+  profilePhoto.value = "";
   showToast(`${name} is toegevoegd — vul nu je eigen gegevens in`);
 });
 
@@ -960,19 +981,10 @@ profileForm.addEventListener("submit", (event) => {
   reader.readAsDataURL(selectedPhoto);
 });
 
-document.querySelector("#today-tasks").addEventListener("click", (event) => {
+document.querySelector("#today-tasks").addEventListener("click", async (event) => {
   const task = event.target.closest("[data-care-task]");
   if (!task) return;
-  const taskId = task.dataset.careTask;
-  if (completedTasks.has(taskId)) {
-    completedTasks.delete(taskId);
-  } else {
-    completedTasks.add(taskId);
-  }
-  saveState();
-  renderCarePlan();
-  renderCalendar();
-  showToast(completedTasks.has(taskId) ? "Verzorgingstaak afgerond" : "Taak weer geopend");
+  await recordCareEvent(task.dataset.careTask);
 });
 
 document.querySelector("#add-plant-button").addEventListener("click", () => {

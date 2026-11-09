@@ -140,6 +140,7 @@ function sanitizeState(input) {
     for (const [plantName, profile] of Object.entries(input.plantProfiles).slice(0, 100)) {
       if (!profile || typeof profile !== "object") continue;
       plantProfiles[plantName.slice(0, 80)] = {
+        ...(typeof profile.species === "string" ? { species: profile.species.slice(0, 80) } : {}),
         customName: typeof profile.customName === "string" ? profile.customName.slice(0, 40) : "",
         location: typeof profile.location === "string" ? profile.location.slice(0, 60) : "",
         date: typeof profile.date === "string" ? profile.date.slice(0, 10) : "",

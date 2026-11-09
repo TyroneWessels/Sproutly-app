@@ -30,7 +30,12 @@
           <div>
             <p class="eyebrow" id="plant-category"></p><h1 id="plant-title"></h1><p class="scientific-name" id="plant-scientific"></p>
             <p id="plant-description"></p>
-            <button type="button" class="primary-button" id="add-plant" disabled>Aan Mijn planten toevoegen</button>
+            <button type="button" class="primary-button" id="add-plant" disabled>Een plant toevoegen</button>
+            <div class="plant-instance-picker" id="plant-instance-picker" hidden>
+              <label for="plant-instance">Welke plant wil je bekijken?</label>
+              <select id="plant-instance"><option value="">Kies een plant</option></select>
+              <small>Elke plant heeft eigen gegevens en een eigen logboek.</small>
+            </div>
             <p id="save-hint">Je kunt ook zonder account je plant bijhouden op deze browser.</p>
           </div>
         </section>
@@ -87,7 +92,7 @@
           </section>
           <section class="plant-detail-panel" aria-labelledby="log-title">
             <p class="eyebrow">Verzorgingslogboek</p><h2 id="log-title">Wat heb je gedaan?</h2>
-            <p>Schrijf op wanneer je voor je plant hebt gezorgd. Je kunt later terugzien wat je hebt gedaan.</p>
+            <p>Schrijf op wanneer je voor je plant hebt gezorgd. De kalender berekent het volgende moment vanaf de laatst geregistreerde datum.</p>
             <form id="care-log-form" class="detail-form">
               <fieldset id="log-fields" disabled>
                 <div class="detail-form-grid">
@@ -106,6 +111,8 @@
     <footer class="site-footer"><span>© <span id="plant-year"></span> Sproutly · <a href="index.html#privacy">Privacy</a></span><span>Gemaakt voor nieuwsgierige kwekers <span aria-hidden="true">♡</span></span></footer>
   </div>
   <script src="plantencollectie.js"></script>
+  <script src="plant-instances.js"></script>
+  <script src="care-schedule.js"></script>
   <script src="assets/supabase-client.js"></script>
   <script src="account.js"></script>
   <script src="plant.js"></script>

@@ -86,3 +86,20 @@ test("outdated pages cannot overwrite newer account data", async () => {
   await assert.rejects(account.saveState({ ...state, savedPlants: [] }), /andere pagina gewijzigd/);
   assert.deepEqual(getStored(), newer);
 });
+
+test("multiple specimens and their logs survive account storage", async () => {
+  const { account, getStored } = createAccount();
+  const state = {
+    savedPlants: ["Monstera", "plant-one", "plant-two"],
+    plantProfiles: {
+      Monstera: { customName: "Oud", careLog: [{ action: "Water gegeven" }] },
+      "plant-one": { species: "Monstera", customName: "Binnen", careLog: [{ action: "Verpot" }] },
+      "plant-two": { species: "Monstera", customName: "Buiten", careLog: [{ action: "Gesnoeid" }] }
+    },
+    completedTasks: ["soil-check-plant-one-2026-11-16"],
+    careOverrides: {}
+  };
+  await account.register("test@example.test", "password", "Test", state);
+  assert.deepEqual(await account.getState(), state);
+  assert.deepEqual(getStored(), state);
+});

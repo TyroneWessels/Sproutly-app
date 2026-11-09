@@ -37,14 +37,14 @@ test("plant profile and care log survive an account state round-trip", async (t)
   assert.equal(register.status, 201);
   const cookie = register.headers.get("set-cookie").split(";")[0];
   const state = {
-    savedPlants: ["Monstera"],
+    savedPlants: ["Monstera", "plant-second"],
     plantProfiles: { Monstera: {
       customName: "Monty", location: "Woonkamer",
       careLog: [
         { id: "1", date: "2026-11-09", action: "Water gegeven", notes: "Beetje water" },
         { id: "invalid", date: "geen datum", action: "Anders" }
       ]
-    } },
+    }, "plant-second": { species: "Monstera", customName: "Tweede" } },
     completedTasks: ["task-1"], careOverrides: { "task-1": "2026-11-10" }
   };
   const save = await fetch(`${url}/api/me/state`, {
@@ -55,6 +55,8 @@ test("plant profile and care log survive an account state round-trip", async (t)
   assert.equal(load.status, 200);
   const stored = await load.json();
   assert.equal(stored.plantProfiles.Monstera.customName, "Monty");
+  assert.equal(stored.plantProfiles["plant-second"].species, "Monstera");
+  assert.equal(stored.plantProfiles["plant-second"].customName, "Tweede");
   assert.deepEqual(stored.plantProfiles.Monstera.careLog, [
     { id: "1", date: "2026-11-09", action: "Water gegeven", notes: "Beetje water" }
   ]);
