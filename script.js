@@ -1,7 +1,7 @@
 const plants = [
   {
     name: "Monstera", aliases: ["gatenplant"], scientific: "Monstera deliciosa", category: "Binnenplant", filter: "indoor",
-    art: "art-monstera", image: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=85",
+    art: "art-monstera",
     description: "Een gulle, makkelijke kamerplant die houdt van helder indirect licht en ruimte om te groeien.",
     facts: ["Helder indirect licht", "Water als de aarde droog is", "Elke 1–2 jaar verpotten"],
     nextCare: "Controleer over 2 dagen of de bovenste aarde droog is.",
@@ -14,7 +14,7 @@ const plants = [
   },
   {
     name: "Basilicum", aliases: ["basil"], scientific: "Ocimum basilicum", category: "Kruid", filter: "indoor",
-    art: "art-herb", image: "https://images.unsplash.com/photo-1618375569909-3c8616cf7733?auto=format&fit=crop&w=800&q=85",
+    art: "art-herb",
     description: "Een zonliefhebber voor in de keuken. Oogst de blaadjes regelmatig voor nieuwe, volle groei.",
     facts: ["Minimaal 6 uur zon", "Houd de aarde licht vochtig", "Knijp bloemen vroeg uit"],
     nextCare: "Knip de eerste bloemknoppen weg voor vollere groei.",
@@ -27,7 +27,7 @@ const plants = [
   },
   {
     name: "Lavendel", aliases: ["lavender"], scientific: "Lavandula angustifolia", category: "Buitenplant", filter: "outdoor",
-    art: "art-lavender", image: "https://images.unsplash.com/photo-1499002238440-d264edd596ec?auto=format&fit=crop&w=800&q=85",
+    art: "art-lavender",
     description: "Een geurende, sterke favoriet die het goed doet in de zon en in luchtige, goed drainerende aarde.",
     facts: ["Volle zon", "Laat de aarde opdrogen", "Snoei na de bloei"],
     nextCare: "Geef pas water wanneer de potgrond droog aanvoelt.",
@@ -40,7 +40,7 @@ const plants = [
   },
   {
     name: "Sansevieria", aliases: ["vrouwentong", "snake plant"], scientific: "Dracaena trifasciata", category: "Binnenplant", filter: "indoor",
-    art: "art-snake", image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=800&q=85",
+    art: "art-snake",
     description: "Een rustige en vergevingsgezinde plant met sterke bladeren. Het liefst laat je haar grotendeels met rust.",
     facts: ["Weinig tot helder licht", "Geef spaarzaam water", "Goed drainerende aarde"],
     nextCare: "Geef deze plant pas water als de aarde volledig droog is.",
@@ -53,7 +53,7 @@ const plants = [
   },
   {
     name: "Aloë vera", aliases: ["aloe", "aloe vera"], scientific: "Aloe barbadensis miller", category: "Binnenplant", filter: "indoor",
-    art: "art-aloe", image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=800&q=85",
+    art: "art-aloe",
     description: "Een sterke vetplant met kalme, puntige bladeren. Geef liever te weinig dan te veel water.",
     facts: ["Veel indirect licht", "Laat de aarde volledig drogen", "Elke 2–3 jaar verpotten"],
     nextCare: "Controleer of de potgrond volledig droog is voordat je water geeft.",
@@ -66,7 +66,7 @@ const plants = [
   },
   {
     name: "Tomaat", aliases: ["tomatenplant", "tomato"], scientific: "Solanum lycopersicum", category: "Buitenplant", filter: "outdoor",
-    art: "art-tomato", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=85",
+    art: "art-tomato",
     description: "Een zonnige groeier die je beloont met smaakvolle vruchten wanneer hij genoeg warmte en steun krijgt.",
     facts: ["Volle zon", "Houd de aarde gelijkmatig vochtig", "Steun de stengels"],
     nextCare: "Bind nieuwe groei voorzichtig aan een stok of rek.",
@@ -79,7 +79,7 @@ const plants = [
   },
   {
     name: "Rozemarijn", aliases: ["rosemary"], scientific: "Salvia rosmarinus", category: "Buitenplant", filter: "outdoor",
-    art: "art-rosemary", image: "https://images.unsplash.com/photo-1515586000433-45406d8e6662?auto=format&fit=crop&w=800&q=85",
+    art: "art-rosemary",
     description: "Een geurige, mediterrane kruidenplant die houdt van zon, warmte en droge voeten.",
     facts: ["Volle zon", "Laat de aarde opdrogen", "Goed drainerende pot"],
     nextCare: "Knip een paar toppen voor een vollere vorm.",
@@ -92,7 +92,7 @@ const plants = [
   },
   {
     name: "Pannenkoekenplant", aliases: ["pilea", "pilea peperomioides"], scientific: "Pilea peperomioides", category: "Binnenplant", filter: "indoor",
-    art: "art-pilea", image: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=800&q=85",
+    art: "art-pilea",
     description: "Een vrolijke kamerplant met ronde bladeren die graag helder staat en nieuwe stekjes maakt.",
     facts: ["Helder indirect licht", "Water als de bovenlaag droog is", "Draai regelmatig"],
     nextCare: "Draai de pot een kwartslag zodat de plant gelijkmatig groeit.",
@@ -549,7 +549,7 @@ function renderPlants(query = "") {
     <article class="plant-card">
       <button class="save-plant ${savedPlants.has(plant.name) ? "saved" : ""}" data-save="${plant.name}" aria-label="${savedPlants.has(plant.name) ? "Verwijder" : "Bewaar"} ${plant.name}">${savedPlants.has(plant.name) ? "♥" : "♡"}</button>
       <button class="plant-art ${plant.art}" data-plant="${plant.name}" aria-label="Bekijk details van ${plant.name}">
-        <img class="plant-photo" src="${plant.imageUrl}" srcset="${getResponsiveImageUrl(plant.imageUrl, 400)} 400w, ${getResponsiveImageUrl(plant.imageUrl, 800)} 800w" sizes="(max-width: 590px) 100vw, (max-width: 850px) 50vw, 260px" alt="${plant.name}" loading="lazy" decoding="async" />
+        <img class="plant-photo" src="${plant.imageUrl}" alt="${plant.name}" loading="lazy" decoding="async" />
       </button>
       <span class="plant-tag">${plant.category}</span>
       <h3>${plant.name}</h3>
@@ -559,10 +559,6 @@ function renderPlants(query = "") {
   `).join("");
   emptyState.hidden = visiblePlants.length > 0;
   plantGrid.querySelectorAll(".plant-photo").forEach((image) => image.addEventListener("error", handleImageError, { once: true }));
-}
-
-function getResponsiveImageUrl(imageUrl, width) {
-  return imageUrl.replace(/([?&])w=\d+/, `$1w=${width}`);
 }
 
 function setApiStatus(message, state = "info") {

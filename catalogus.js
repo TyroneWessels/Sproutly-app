@@ -19,10 +19,6 @@ function escapeCatalogHtml(value) {
   }[character]));
 }
 
-function imageUrl(image, width) {
-  return image.replace(/\/\d+px-([^/]+)$/, `/${width}px-$1`);
-}
-
 function showCatalogToast(message) {
   catalogToast.textContent = message;
   catalogToast.classList.add("show");
@@ -94,7 +90,7 @@ function renderCatalog() {
         ${savedPlants.has(plant.name) ? "♥ Opgeslagen" : "♡ Aan mijn planten"}
       </button>
       <div class="plant-art ${plant.art}">
-        <img class="plant-photo" src="${plant.image}" srcset="${imageUrl(plant.image, 400)} 400w, ${imageUrl(plant.image, 800)} 800w" sizes="(max-width: 590px) 100vw, (max-width: 850px) 50vw, 260px" alt="${plant.name}" loading="lazy" decoding="async" />
+        <img class="plant-photo" src="${plant.image}" alt="${plant.name}" loading="lazy" decoding="async" />
       </div>
       <span class="plant-tag">${plant.category}</span>
       <h3>${plant.name}</h3>
