@@ -50,7 +50,7 @@ test("the header shows Growify initials without an account and user initials aft
   const updateAccountUi = source.slice(source.indexOf("function updateAccountUi()"), source.indexOf("function setAuthMode(mode)"));
   const ui = {
     currentUser: null, accountAvatar: {}, accountNameLabel: {},
-    profileButton: { setAttribute(name, value) { this[name] = value; } },
+    profileButton: { hidden: false, setAttribute(name, value) { this[name] = value; } },
     accountDataActions: {}
   };
   vm.runInNewContext(updateAccountUi, ui);
@@ -69,7 +69,14 @@ test("the header shows Growify initials without an account and user initials aft
 test("all account headers initially show signed-out text", () => {
   for (const file of ["index.html", "mijn-planten.html", "kalender.html", "planten.html", "plant.html"]) {
     const html = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
+    assert.doesNotMatch(html, /class="profile-button"[^>]*hidden/, file);
     assert.match(html, /class="avatar">GW<\/span>/, file);
     assert.match(html, /class="profile-name">Inloggen<\/span>/, file);
   }
+});
+
+test("the collection page has one shared sign-in control in the header", () => {
+  const html = fs.readFileSync(path.join(__dirname, "..", "mijn-planten.html"), "utf8");
+  assert.match(html, /class="profile-button"[^>]*>[\s\S]*class="profile-name">Inloggen<\/span>/);
+  assert.doesNotMatch(html, /data-login-link/);
 });
