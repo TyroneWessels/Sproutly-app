@@ -18,7 +18,7 @@
   --ink: #173c32;
   --muted: #495f55;
   --cream: #f7f5ed;
-  --page-background: #eaf2e6;
+  --page-background: #e8eff2;
   --paper: #fffdf8;
   --green: #2f7259;
   --light-green: #dcebd7;
@@ -437,7 +437,7 @@ h2 span { color: #cf7d5f; }
 body {
   font-size: 16px;
   line-height: 1.55;
-  background: #f7f6ef;
+  background: var(--page-background);
 }
 button, input, select, textarea { font-family: inherit; }
 h1, h2 { font-weight: 800; letter-spacing: -.035em; line-height: 1.12; }
