@@ -1,4 +1,4 @@
-# Sproutly productiechecklist
+# Growify productiechecklist
 
 Deze checklist beschrijft de stappen die buiten de lokale prototypeomgeving nodig zijn.
 

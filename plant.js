@@ -293,12 +293,12 @@ if (!plant) {
   document.querySelector("#plant-not-found").hidden = false;
 } else {
   page.hidden = false;
-  document.title = `${plant.name} | Sproutly`;
+  document.title = `${plant.name} | Growify`;
   document.querySelector("#plant-title").textContent = plant.name;
   document.querySelector("#plant-category").textContent = plant.category;
   document.querySelector("#plant-scientific").textContent = plant.scientific;
   document.querySelector("#plant-description").textContent = descriptions[plant.name]
-    || `${plant.name} (${plant.scientific}) is een ${plant.type.toLowerCase()} uit de Sproutly-collectie.`;
+    || `${plant.name} (${plant.scientific}) is een ${plant.type.toLowerCase()} uit de Growify-collectie.`;
   document.querySelector("#plant-light").textContent = plant.light;
   document.querySelector("#plant-interval").textContent = `Ongeveer elke ${plant.soilCheckDays} dagen; vaker als de omstandigheden daarom vragen.`;
   document.querySelector("#plant-difficulty").textContent = plant.difficulty === "easy" ? "Makkelijk" : "Gemiddeld";

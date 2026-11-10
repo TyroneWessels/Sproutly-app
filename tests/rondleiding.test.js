@@ -45,7 +45,7 @@ function setup(href = "https://example.test/project/") {
 test("rondleiding bezoekt de juiste pagina's en vorige gaat terug", () => {
   let page = setup();
   page.get("start").handlers.click();
-  assert.equal(page.get("title").textContent, "Welkom bij Sproutly");
+  assert.equal(page.get("title").textContent, "Welkom bij Growify");
   assert.equal(page.get("back").hidden, true);
 
   const expected = [

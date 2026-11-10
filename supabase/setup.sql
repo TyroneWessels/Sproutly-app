@@ -1,4 +1,4 @@
--- Run in the Supabase SQL Editor for the Sproutly project.
+-- Run in the Supabase SQL Editor for the Growify project.
 create table if not exists public.sproutly_user_data (
   user_id uuid primary key references auth.users(id) on delete cascade,
   state jsonb not null default '{"savedPlants":[],"plantProfiles":{},"completedTasks":[],"careOverrides":{}}'::jsonb,

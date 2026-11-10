@@ -360,7 +360,7 @@ const server = http.createServer(async (request, response) => {
 
 ensureDatabase()
   .then(() => server.listen(port, () => {
-    console.log(`Sproutly draait op http://localhost:${port}`);
+    console.log(`Growify draait op http://localhost:${port}`);
   }))
   .catch((error) => {
     console.error("Database kon niet worden gestart:", error.message);

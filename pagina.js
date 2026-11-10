@@ -54,7 +54,7 @@ async function syncAccountState() {
     await window.SproutlyAccount.saveState(accountState);
     return true;
   } catch (error) {
-    console.error("Sproutly-accountgegevens konden niet worden opgeslagen:", error);
+    console.error("Growify-accountgegevens konden niet worden opgeslagen:", error);
     toast(error.message || "De wijziging kon niet naar je account worden opgeslagen.");
     return false;
   }

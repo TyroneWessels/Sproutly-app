@@ -248,7 +248,7 @@ async function syncStateToServer() {
     });
     return true;
   } catch (error) {
-    console.error("Sproutly-data kon niet worden gesynchroniseerd:", error);
+    console.error("Growify-data kon niet worden gesynchroniseerd:", error);
     showToast(error.message || "Je wijzigingen konden niet naar de server worden opgeslagen");
     return false;
   }
@@ -308,13 +308,13 @@ collectionMoreButton.addEventListener("click", () => {
 function updateAccountUi() {
   if (currentUser) {
     const initials = currentUser.displayName.split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
-    accountAvatar.textContent = initials || "SP";
+    accountAvatar.textContent = initials || "GW";
     accountNameLabel.textContent = currentUser.displayName;
     profileButton.setAttribute("aria-label", `Account van ${currentUser.displayName}`);
     accountDataActions.hidden = false;
     return;
   }
-  accountAvatar.textContent = "SP";
+  accountAvatar.textContent = "GW";
   accountNameLabel.textContent = "Inloggen";
   profileButton.setAttribute("aria-label", "Inloggen of account maken");
   accountDataActions.hidden = true;
@@ -325,7 +325,7 @@ function setAuthMode(mode) {
   document.querySelectorAll("[data-auth-mode]").forEach((tab) => tab.classList.toggle("active", tab.dataset.authMode === mode));
   const registering = mode === "register";
   const signedIn = Boolean(currentUser);
-  authTitle.textContent = signedIn ? "Jouw groene account." : registering ? "Bewaar je planten overal." : "Welkom terug bij Sproutly.";
+  authTitle.textContent = signedIn ? "Jouw groene account." : registering ? "Bewaar je planten overal." : "Welkom terug bij Growify.";
   authIntro.hidden = signedIn;
   authTabs.hidden = signedIn;
   authAccountSummary.hidden = !signedIn;
@@ -588,7 +588,7 @@ async function checkGbifName(query) {
     if (requestNumber !== gbifRequestNumber) return;
     const plantResults = (payload.results || []).filter((result) => !result.kingdom || result.kingdom === "Plantae");
     if (plantResults.length) {
-      const message = `GBIF heeft ${plantResults.length} taxonomische match${plantResults.length === 1 ? "" : "es"} gevonden. De verzorging komt uit Sproutly.`;
+      const message = `GBIF heeft ${plantResults.length} taxonomische match${plantResults.length === 1 ? "" : "es"} gevonden. De verzorging komt uit Growify.`;
       gbifCache.set(normalizedQuery.toLowerCase(), { message, state: "success", expiresAt: Date.now() + 10 * 60 * 1000 });
       setApiStatus(message, "success");
     } else {
@@ -1015,7 +1015,7 @@ document.querySelector("#reminder-button").addEventListener("click", async () =>
       showToast("Meldingen zijn niet ingeschakeld");
       return;
     }
-    new Notification("Sproutly", {
+    new Notification("Growify", {
       body: "Je seizoensherinnering staat klaar."
     });
     showToast("Je seizoensherinnering staat klaar");

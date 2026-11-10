@@ -1,19 +1,19 @@
-# Functioneel ontwerp — Sproutly
+# Functioneel ontwerp — Growify
 
 **Versie:** 1.0  
 **Status:** Concept  
 **Taal:** Nederlands  
-**Product:** Sproutly — planten verzorgen wordt makkelijk
+**Product:** Growify — planten verzorgen wordt makkelijk
 
 ## 1. Inleiding
 
-Sproutly is een webapplicatie voor mensen die hun planten beter willen leren kennen en verzorgen. Een gebruiker kan planten opzoeken, verzorgingsinformatie lezen, planten bewaren in een persoonlijke collectie en herinneringen bijhouden.
+Growify is een webapplicatie voor mensen die hun planten beter willen leren kennen en verzorgen. Een gebruiker kan planten opzoeken, verzorgingsinformatie lezen, planten bewaren in een persoonlijke collectie en herinneringen bijhouden.
 
 De website moet deskundig aanvoelen zonder ingewikkeld te worden. De toon is vriendelijk, rustig en motiverend. De interface gebruikt natuurtinten, echte plantenfoto’s en korte uitleg.
 
 ## 2. Doel van het product
 
-Sproutly helpt gebruikers om:
+Growify helpt gebruikers om:
 
 - snel betrouwbare basisinformatie over een plant te vinden;
 - te begrijpen wanneer en hoe een plant water, licht, voeding of een nieuwe pot nodig heeft;
@@ -47,12 +47,12 @@ Ervaren thuiskwekers die een eenvoudig overzicht willen van hun planten en verzo
 
 ### Productkeuzes voor versie 1
 
-- Sproutly ondersteunt zowel kamerplanten als tuinplanten.
+- Growify ondersteunt zowel kamerplanten als tuinplanten.
 - De eerste adviezen zijn gericht op gebruikers in Nederland en België met een gematigd zeeklimaat.
-- De productnaam is Sproutly.
+- De productnaam is Growify.
 - De bestaande rustige, speelse natuurstijl met groene, crème- en perziktinten blijft de visuele basis.
 - Locatiegebaseerde seizoensadviezen zijn toegevoegd via de browserlocatie; coördinaten worden niet opgeslagen.
-- De lokale Sproutly-dataset blijft de bron voor Nederlandse verzorgingsadviezen.
+- De lokale Growify-dataset blijft de bron voor Nederlandse verzorgingsadviezen.
 - GBIF wordt als gratis read-only bron gebruikt voor taxonomische naamcontrole en aanvullende plantmatches; GBIF vervangt de lokale verzorgingsinformatie niet.
 - Een ingelogde gebruiker bewaart collectie- en verzorgingsdata server-side; lokale opslag blijft beschikbaar als anonieme prototypefallback.
 
@@ -68,7 +68,7 @@ Ervaren thuiskwekers die een eenvoudig overzicht willen van hun planten en verzo
 - Basisverzorgingstaken bekijken en afvinken.
 - Eenvoudige lokale opslag in de browser.
 - Een account aanmaken en op meerdere apparaten dezelfde collectie synchroniseren.
-- Accountgegevens en Sproutly-status exporteren of verwijderen.
+- Accountgegevens en Growify-status exporteren of verwijderen.
 - Responsive weergave op mobiel, tablet en desktop.
 
 ### Buiten de scope van versie 1
@@ -90,7 +90,7 @@ De website bestaat uit de volgende hoofdonderdelen:
    - Seizoensadviezen.
    - Populaire planten.
 2. **Alle planten**
-   - Volledige catalogus van de lokale Sproutly-dataset.
+   - Volledige catalogus van de lokale Growify-dataset.
    - Zoeken op naam, alias, wetenschappelijke naam, categorie, type en lichtbehoefte.
    - Filteren op binnen/buiten, licht en moeilijkheid.
    - Sorteren op relevantie, naam en moeilijkheid.
@@ -116,7 +116,7 @@ De website bestaat uit de volgende hoofdonderdelen:
 1. De gebruiker opent de homepage.
 2. De gebruiker vult een plantnaam in.
 3. De gebruiker klikt op **Zoeken** of drukt op Enter.
-4. Sproutly zoekt in de beschikbare plantdata.
+4. Growify zoekt in de beschikbare plantdata.
 5. De resultaten verschijnen onder Populaire planten.
 
 **Zoekvelden:**
@@ -135,7 +135,7 @@ De website bestaat uit de volgende hoofdonderdelen:
 - Bij nul resultaten verschijnt een duidelijke melding.
 - De zoekopdracht blijft zichtbaar in het zoekveld.
 
-Na een zoekopdracht controleert Sproutly de zoekterm via de openbare GBIF Species API. Tijdens deze controle toont de zoekbalk een laadstatus. Bij een succesvolle controle toont de website hoeveel taxonomische matches GBIF heeft gevonden. De lokale zoekresultaten blijven leidend voor plantkaarten en verzorgingsdetails.
+Na een zoekopdracht controleert Growify de zoekterm via de openbare GBIF Species API. Tijdens deze controle toont de zoekbalk een laadstatus. Bij een succesvolle controle toont de website hoeveel taxonomische matches GBIF heeft gevonden. De lokale zoekresultaten blijven leidend voor plantkaarten en verzorgingsdetails.
 
 Wanneer GBIF niet bereikbaar is of een fout teruggeeft:
 
@@ -204,7 +204,7 @@ De gebruiker kan meerdere exemplaren van dezelfde soort toevoegen. Via **Verwijd
 
 Zonder account gebruikt de website `localStorage`. Een ingelogde gebruiker gebruikt Supabase als bron van waarheid; de lokale browsergegevens blijven daarvan gescheiden.
 
-Wanneer de collectie leeg is, toont Sproutly een korte uitleg en een knop om planten te bekijken.
+Wanneer de collectie leeg is, toont Growify een korte uitleg en een knop om planten te bekijken.
 
 Met **Alleen mijn favorieten tonen** kan de gebruiker de collectie filteren op exemplaren die in hun profiel als favoriet zijn gemarkeerd. Als er geen favorieten zijn, verschijnt uitleg en een knop om alle planten weer te tonen.
 
@@ -237,7 +237,7 @@ De taken volgen het logboek en de opgeslagen exemplaren. Na bevestiging registre
 
 ### 6.9 Seizoensbepaling
 
-Sproutly bepaalt het actuele meteorologische seizoen automatisch met de datum van de computer van de gebruiker. Voor het eerste doelgebied, Nederland en België, gelden de volgende indelingen:
+Growify bepaalt het actuele meteorologische seizoen automatisch met de datum van de computer van de gebruiker. Voor het eerste doelgebied, Nederland en België, gelden de volgende indelingen:
 
 - Winter: december, januari en februari.
 - Lente: maart, april en mei.
@@ -248,7 +248,7 @@ De seizoensnaam en de drie aanbevolen taken op de homepage worden aangepast aan 
 
 ### 6.10 Locatie en klimaat
 
-De gebruiker kan via **Gebruik mijn locatie** toestemming geven voor de browser Geolocation API. Sproutly gebruikt de latitude alleen om het halfrond te bepalen:
+De gebruiker kan via **Gebruik mijn locatie** toestemming geven voor de browser Geolocation API. Growify gebruikt de latitude alleen om het halfrond te bepalen:
 
 - Noordelijk halfrond: de standaard seizoensindeling voor Nederland en België.
 - Zuidelijk halfrond: de seizoensadviezen worden omgedraaid.
@@ -363,10 +363,10 @@ Supabase Auth beheert het account en de sessie. De tabel `sproutly_user_data` ko
 
 Jamie wil weten hoe een Monstera verzorgd moet worden.
 
-1. Jamie opent Sproutly.
+1. Jamie opent Growify.
 2. Jamie typt “Monstera” in de zoekbalk.
 3. Jamie klikt op de Monstera-kaart.
-4. Sproutly toont licht- en waterinformatie.
+4. Growify toont licht- en waterinformatie.
 5. Jamie leest wanneer de aarde opnieuw gecontroleerd kan worden.
 
 ### Scenario B — Een plant bewaren
@@ -375,7 +375,7 @@ Jamie heeft een Basilicumplant en wil deze onthouden.
 
 1. Jamie zoekt op Basilicum.
 2. Jamie voegt een exemplaar toe.
-3. Sproutly toont een bevestiging.
+3. Growify toont een bevestiging.
 4. Basilicum verschijnt in Mijn planten.
 5. De keuze blijft staan na het vernieuwen van de pagina.
 
@@ -385,7 +385,7 @@ Jamie wil een verzorgingshandeling vastleggen.
 
 1. Jamie opent de verzorgingskalender.
 2. Jamie kiest een gepland verzorgingsmoment en bevestigt dat de handeling vandaag is uitgevoerd.
-3. Sproutly registreert de handeling in het logboek.
+3. Growify registreert de handeling in het logboek.
 4. De volgende datum wordt op basis van de registratie berekend.
 5. Bij een vergissing kan Jamie de logboekregel verwijderen, waarna de planning opnieuw wordt berekend.
 
@@ -440,9 +440,9 @@ De onderstaande vermeldingen zijn historisch en beschrijven beslissingen en prot
 
 ### 5 november 2026 — vervolg
 
-- Sproutly voor versie 1 vastgesteld als app voor zowel binnen- als buitenplanten.
+- Growify voor versie 1 vastgesteld als app voor zowel binnen- als buitenplanten.
 - Nederland en België met een gematigd zeeklimaat vastgesteld als eerste doelgroepgebied.
-- De naam Sproutly en de bestaande huisstijl als definitieve basis vastgelegd.
+- De naam Growify en de bestaande huisstijl als definitieve basis vastgelegd.
 - De zoekfunctie uitgebreid met planttype, lichtbehoefte en moeilijkheidsgraad als functionele eis.
 - Reden: deze keuzes sluiten aan op de huidige dataset en maken de eerste versie concreet zonder locatie- of accountfunctionaliteit af te wachten.
 
@@ -479,7 +479,7 @@ De onderstaande vermeldingen zijn historisch en beschrijven beslissingen en prot
 
 ### 5 november 2026 — GBIF
 
-- GBIF gekozen als gratis taxonomische bron naast de lokale Sproutly-verzorgingsdata.
+- GBIF gekozen als gratis taxonomische bron naast de lokale Growify-verzorgingsdata.
 - Laad-, succes- en foutstatus toegevoegd aan de zoekflow.
 - Reden: OpenFarm bleek niet meer bereikbaar en Perenual heeft voor dit prototype een te beperkte gratis daglimiet. GBIF biedt een gratis read-only endpoint zonder API-sleutel voor naamcontrole, terwijl verzorgingsadviezen onder eigen broncontrole blijven.
 
@@ -508,11 +508,11 @@ De onderstaande vermeldingen zijn historisch en beschrijven beslissingen en prot
 ### 5 november 2026 — browsernotificaties
 
 - De herinneringsknop gekoppeld aan de browser Notification API met toestemming, successtatus en fout-/weigeringsterugval.
-- Reden: de bestaande knop gaf alleen lokale feedback; gebruikers moeten expliciet kunnen kiezen of Sproutly browsermeldingen mag tonen.
+- Reden: de bestaande knop gaf alleen lokale feedback; gebruikers moeten expliciet kunnen kiezen of Growify browsermeldingen mag tonen.
 
 ### 5 november 2026 — serveropslag en accounts
 
-- Een dependency-vrije Node-backend toegevoegd met registratie, login, logout, HttpOnly sessies en server-side opslag van Sproutly-status.
+- Een dependency-vrije Node-backend toegevoegd met registratie, login, logout, HttpOnly sessies en server-side opslag van Growify-status.
 - De frontend synchroniseert ingelogde plantgegevens met de server en gebruikt localStorage alleen zonder account.
 - Reden: browseropslag is apparaatgebonden en heeft geen synchronisatie of betrouwbare back-up. De JSON-opslag is een ontwikkelstap; een productie-database en back-upstrategie blijven open.
 

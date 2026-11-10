@@ -1,4 +1,4 @@
-# Sproutly lokaal starten en accounts instellen
+# Growify lokaal starten en accounts instellen
 
 ## Accounts op GitHub Pages
 
@@ -41,7 +41,7 @@ http://localhost:3000
 
 De website gebruikt Supabase voor accounts, ook wanneer de bestanden via deze lokale server of GitHub Pages worden geopend. De server hieronder biedt daarnaast de oudere lokale account-API; die accounts staan los van Supabase.
 
-De backend maakt bij de eerste start automatisch `data/sproutly.json` aan. Dit bestand bevat accounts, sessies en server-side Sproutly-status.
+De backend maakt bij de eerste start automatisch `data/sproutly.json` aan. Dit bestand bevat accounts, sessies en server-side Growify-status.
 
 ## API-routes
 
@@ -52,9 +52,9 @@ De backend maakt bij de eerste start automatisch `data/sproutly.json` aan. Dit b
 | `POST` | `/api/auth/login` | Logt een gebruiker in |
 | `POST` | `/api/auth/logout` | Beëindigt de sessie |
 | `GET` | `/api/auth/me` | Geeft de huidige gebruiker terug |
-| `GET` | `/api/me/state` | Leest de Sproutly-status |
-| `PUT` | `/api/me/state` | Slaat de Sproutly-status op |
-| `GET` | `/api/me/export` | Exporteert account en Sproutly-status als JSON |
+| `GET` | `/api/me/state` | Leest de Growify-status |
+| `PUT` | `/api/me/state` | Slaat de Growify-status op |
+| `GET` | `/api/me/export` | Exporteert account en Growify-status als JSON |
 | `DELETE` | `/api/me` | Verwijdert het account, de sessies en de serverstatus |
 
 ## Prototype-opmerkingen

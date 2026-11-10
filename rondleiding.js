@@ -1,6 +1,6 @@
 (() => {
   const steps = [
-    { path: "./", title: "Welkom bij Sproutly", description: "In deze rondleiding bezoeken we de belangrijkste pagina's. Je kunt op elk moment stoppen." },
+    { path: "./", title: "Welkom bij Growify", description: "In deze rondleiding bezoeken we de belangrijkste pagina's. Je kunt op elk moment stoppen." },
     { path: "planten/", title: "Zoek een plant", description: "Op Alle planten kun je zoeken en filteren. Open een plant om meer te lezen of deze toe te voegen." },
     { path: "plant/?naam=Monstera", title: "Bekijk en voeg een plant toe", description: "Dit is de pagina van de Monstera als voorbeeld. Met Een plant toevoegen bewaar je een exemplaar. Daarna kun je op de plantpagina gegevens en verzorgingsmomenten bijhouden." },
     { path: "mijn-planten/", title: "Bekijk jouw planten", description: "Hier vind je jouw opgeslagen planten. Open een plant om de gegevens en het verzorgingslogboek te bekijken of te bewerken." },

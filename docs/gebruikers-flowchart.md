@@ -1,10 +1,10 @@
-# Gebruikersflow van Sproutly
+# Gebruikersflow van Growify
 
 De hoofdroute is bewust eenvoudig: bezoekers kunnen eerst rustig rondkijken, hoeven geen account te maken en krijgen na belangrijke acties duidelijke bevestiging.
 
 ```mermaid
 flowchart TD
-    A([Start: open Sproutly]) --> B[Startpagina: Ontdek]
+    A([Start: open Growify]) --> B[Startpagina: Ontdek]
     B --> C{Wat wilt u doen?}
 
     C -->|Een plant zoeken| D[Open Alle planten]
@@ -13,7 +13,7 @@ flowchart TD
     F --> FF[Open de plantpagina voor informatie en verzorging]
     FF --> G{Plant bewaren?}
     G -->|Ja| H[Klik op Aan mijn planten]
-    H --> I[Sproutly bevestigt dat de plant is opgeslagen]
+    H --> I[Growify bevestigt dat de plant is opgeslagen]
     I --> J[Open Mijn planten]
     G -->|Nog niet| E
 
@@ -42,9 +42,9 @@ flowchart TD
     W --> R
 
     B --> X{Wilt u uw gegevens op meerdere apparaten bewaren?}
-    X -->|Nee| Y[Gebruik Sproutly zonder account]
+    X -->|Nee| Y[Gebruik Growify zonder account]
     Y --> Z[Planten blijven op deze browser bewaard]
-    X -->|Ja| AA{Is de Sproutly-server beschikbaar?}
+    X -->|Ja| AA{Is de Growify-server beschikbaar?}
     AA -->|Ja| AB[Maak een account of log in]
     AB --> AC[Bewaar de collectie bij het account]
     AA -->|Nee| AD[Toon duidelijke uitleg en startinstructies]

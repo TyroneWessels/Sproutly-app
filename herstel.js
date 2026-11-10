@@ -53,7 +53,7 @@ updateForm.addEventListener("submit", async (event) => {
     updateForm.hidden = true;
     subscription.unsubscribe();
     intro.textContent = "Je wachtwoord is gewijzigd.";
-    status.textContent = "Je kunt terug naar Sproutly.";
+    status.textContent = "Je kunt terug naar Growify.";
   } catch (error) {
     console.error("Wachtwoord wijzigen mislukt:", error);
     status.textContent = "Het wachtwoord kon niet worden gewijzigd. Probeer opnieuw of vraag een nieuwe herstellink aan.";

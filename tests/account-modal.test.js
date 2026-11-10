@@ -46,7 +46,7 @@ test("signed-out login and registration remain available", () => {
   assert.equal(ui.authPassword.autocomplete, "new-password");
 });
 
-test("the header shows Sproutly initials without an account and user initials after login", () => {
+test("the header shows Growify initials without an account and user initials after login", () => {
   const updateAccountUi = source.slice(source.indexOf("function updateAccountUi()"), source.indexOf("function setAuthMode(mode)"));
   const ui = {
     currentUser: null, accountAvatar: {}, accountNameLabel: {},
@@ -55,7 +55,7 @@ test("the header shows Sproutly initials without an account and user initials af
   };
   vm.runInNewContext(updateAccountUi, ui);
   ui.updateAccountUi();
-  assert.equal(ui.accountAvatar.textContent, "SP");
+  assert.equal(ui.accountAvatar.textContent, "GW");
   assert.equal(ui.accountNameLabel.textContent, "Inloggen");
   ui.currentUser = { displayName: "Groene Vriend" };
   ui.updateAccountUi();
@@ -63,13 +63,13 @@ test("the header shows Sproutly initials without an account and user initials af
   assert.equal(ui.accountNameLabel.textContent, "Groene Vriend");
   ui.currentUser = null;
   ui.updateAccountUi();
-  assert.equal(ui.accountAvatar.textContent, "SP");
+  assert.equal(ui.accountAvatar.textContent, "GW");
 });
 
 test("all account headers initially show signed-out text", () => {
   for (const file of ["index.html", "mijn-planten.html", "kalender.html", "planten.html", "plant.html"]) {
     const html = fs.readFileSync(path.join(__dirname, "..", file), "utf8");
-    assert.match(html, /class="avatar">SP<\/span>/, file);
+    assert.match(html, /class="avatar">GW<\/span>/, file);
     assert.match(html, /class="profile-name">Inloggen<\/span>/, file);
   }
 });

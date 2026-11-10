@@ -1,10 +1,10 @@
-# Sproutly gebruikershandleiding
+# Growify gebruikershandleiding
 
 Op de homepage kun je met **Bekijk de korte rondleiding** uitleg krijgen over zoeken, toevoegen en verzorgen. Met **Volgende** en **Vorige** ga je naar de bijbehorende pagina's; de Monstera is een voorbeeld en wordt niet automatisch toegevoegd. Je kunt de rondleiding op elke pagina sluiten en later op de homepage opnieuw openen.
 
 ## Een plant zoeken
 
-1. Open Sproutly.
+1. Open Growify.
 2. Vul een Nederlandse naam, wetenschappelijke naam of categorie in.
 3. Kies **Zoeken** of druk op Enter.
 4. Gebruik eventueel de filters voor binnen/buiten, licht en moeilijkheid.
@@ -26,9 +26,9 @@ De maandkalender toont geplande water-, bemestings- en verpotmomenten. Open een 
 
 ## Locatie en meldingen
 
-Met **Gebruik mijn locatie** kan Sproutly na toestemming het seizoensadvies aanpassen aan het halfrond. De locatie wordt niet opgeslagen.
+Met **Gebruik mijn locatie** kan Growify na toestemming het seizoensadvies aanpassen aan het halfrond. De locatie wordt niet opgeslagen.
 
-Met **Herinnering instellen** vraagt Sproutly toestemming voor een browsermelding. Bij weigering blijft de website gewoon bruikbaar.
+Met **Herinnering instellen** vraagt Growify toestemming voor een browsermelding. Bij weigering blijft de website gewoon bruikbaar.
 
 ## Account en privacy
 

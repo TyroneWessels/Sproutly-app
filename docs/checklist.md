@@ -1,13 +1,13 @@
-# Sproutly website checklist
+# Growify website checklist
 
 ## 1. Product en doel
 
 - [x] Het doel van de website is duidelijk: planten zoeken en beter verzorgen.
 - [x] De doelgroep is beschreven: beginnende en ervaren thuiskwekers.
 - [x] De eerste doelgroep en belangrijkste gebruikssituatie definitief kiezen. Primaire doelgroep: beginnende plantenliefhebbers. Belangrijkste gebruikssituatie: een onbekende plant opzoeken en direct de belangrijkste verzorgingsstap begrijpen.
-- [x] Bepalen of Sproutly vooral voor kamerplanten, tuinplanten of beide wordt ontwikkeld. Sproutly ondersteunt in versie 1 zowel binnen- als buitenplanten.
+- [x] Bepalen of Growify vooral voor kamerplanten, tuinplanten of beide wordt ontwikkeld. Growify ondersteunt in versie 1 zowel binnen- als buitenplanten.
 - [x] Bepalen voor welke landen en klimaatzones de adviezen gelden. Versie 1 richt zich op Nederland en België met een gematigd zeeklimaat; locatiegebaseerde adviezen blijven een vervolgstap.
-- [x] Een definitieve naam, huisstijl en logo kiezen. Productnaam: Sproutly. De bestaande rustige, speelse natuurstijl en het bladmerk blijven behouden.
+- [x] Een definitieve naam, huisstijl en logo kiezen. Productnaam: Growify. De bestaande rustige, speelse natuurstijl en het bladmerk blijven behouden.
 
 ## 2. Prototype en gebruikersinterface
 
@@ -93,7 +93,7 @@
 
 - [x] De prototypeversie werkt zonder framework of installatie.
 - [x] De plantdata is centraal opgebouwd in JavaScript.
-- [x] Een backend of plantdata-API kiezen. GBIF wordt gebruikt voor gratis taxonomische naamcontrole; lokale Sproutly-data blijft de bron voor verzorgingsadvies.
+- [x] Een backend of plantdata-API kiezen. GBIF wordt gebruikt voor gratis taxonomische naamcontrole; lokale Growify-data blijft de bron voor verzorgingsadvies.
 - [x] Controleren of de API commercieel gebruikt mag worden. GBIF-gebruik is niet automatisch voor alle onderliggende datasets commercieel toegestaan; datasetlicenties en attributie moeten voor productie per match gecontroleerd blijven worden.
 - [ ] De bronvermelding en licentie van iedere plantfoto voor productie controleren. De huidige catalogus gebruikt lokale foto's met bronlinks.
 - [x] Supabase instellen voor accounts en gebruikersgegevens; plantinformatie blijft onderdeel van de lokale catalogus.
