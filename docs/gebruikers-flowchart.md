@@ -24,6 +24,7 @@ flowchart TD
     K -->|Ja| M[Bekijk uw planten en kies Bekijk in de catalogus]
     M --> FF
     J --> LOG[Open een plant en vul plantgegevens in]
+    LOG --> LOG3[Pas optioneel verzorgingsintervallen aan voor dit exemplaar]
     LOG --> LOG2[Voeg verzorgingsmomenten toe aan het logboek]
 
     C -->|Verzorging plannen| N[Open Verzorgingskalender]
@@ -33,12 +34,13 @@ flowchart TD
     Q --> O
     P -->|Nee| R([Klaar])
     O --> S{Herinnering gewenst?}
-    S -->|Ja| T[Klik op Herinnering instellen]
-    T --> U{Klik op Browsermeldingen controleren; ondersteunt de browser dit en geeft de gebruiker toestemming?}
-    U -->|Ja| V[Bevestig toestemming; automatische verzorgingsmeldingen zijn nog niet beschikbaar]
+    S -->|Ja| T[Klik op Verzorgingsmeldingen inschakelen]
+    T --> U{Ondersteunt de browser meldingen en geeft de gebruiker toestemming?}
+    U -->|Ja| V[Toon meldingen op dagen met taken zolang de homepage, Mijn planten of de kalender open is]
     U -->|Nee| W[Leg uit dat meldingen niet zijn ingeschakeld of ondersteund]
     S -->|Nee| R
-    V --> R
+    V --> VX[Leg uit dat gesloten browsers geen meldingen ontvangen]
+    VX --> R
     W --> R
 
     B --> X{Wilt u uw gegevens op meerdere apparaten bewaren?}
@@ -47,6 +49,7 @@ flowchart TD
     X -->|Ja| AA{Is de Growify-server beschikbaar?}
     AA -->|Ja| AB[Maak een account of log in]
     AB --> AC[Bewaar de collectie bij het account]
+    AC --> AC2[Exporteer of voeg een Growify-back-up samen na een preview]
     AA -->|Nee| AD[Toon duidelijke uitleg en startinstructies]
     AD --> Y
 ```
@@ -60,4 +63,4 @@ flowchart TD
 - Leg fouten uit in gewone taal en geef meteen de volgende stap.
 - Gebruik naast kleur ook tekst, pictogrammen of markeringen om informatie duidelijk te maken.
 - Houd de hoofdnavigatie op elke pagina op dezelfde plek en gebruik overal dezelfde paginanamen.
-- Browsertoestemming is geen geplande herinnering: automatische verzorgingsmeldingen zijn nog niet beschikbaar.
+- Herinner gebruikers eraan dat de pagina en browser open moeten blijven; gesloten browsers ontvangen geen verzorgingsmeldingen.

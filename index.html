@@ -201,8 +201,9 @@
           <p class="eyebrow">Een zachte herinnering</p>
           <h2>Kleine stappen maken<br /><em>gelukkige planten.</em></h2>
         </div>
-        <p>Krijg een rustige seizoensherinnering met tips voor jouw tuin.</p>
-        <button class="outline-button" id="reminder-button">Herinnering instellen</button>
+        <p>Ontvang een melding op dagen met verzorgingsmomenten. Dit werkt zolang de homepage, Mijn planten of de kalender open is in deze browser.</p>
+        <button class="outline-button" id="reminder-button" type="button">Verzorgingsmeldingen inschakelen</button>
+        <p class="reminder-status" id="reminder-status" role="status" aria-live="polite"></p>
       </section>
     </main>
 
@@ -291,6 +292,8 @@
         <button class="outline-button auth-logout" id="logout-button" hidden>Uitloggen</button>
         <div class="account-data-actions" id="account-data-actions" hidden>
           <button class="text-button" type="button" id="export-data-button">Mijn gegevens exporteren</button>
+          <button class="text-button" type="button" id="import-data-button">Geëxporteerde gegevens samenvoegen</button>
+          <input id="import-data-file" type="file" accept=".json,application/json" hidden />
           <button class="text-button danger-button" type="button" id="delete-account-button">Account en gegevens verwijderen</button>
         </div>
       </div>
@@ -306,6 +309,8 @@
   <script src="plantencollectie.js"></script>
   <script src="plant-instances.js"></script>
   <script src="care-schedule.js"></script>
+  <script src="data-transfer.js"></script>
+  <script src="care-reminders.js"></script>
   <script src="assets/supabase-client.js"></script>
   <script src="account.js"></script>
   <script src="script.js"></script>

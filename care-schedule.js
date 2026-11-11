@@ -15,6 +15,10 @@
     repotting: { title: "Controleer of verpotten nodig is", action: "Verpot", actions: ["Verpot"] }
   };
 
+  function defaultIntervals(name) {
+    return { watering: window.SPROUTLY_PLANTS.find((plant) => plant.name === name)?.soilCheckDays, ...intervals[name] };
+  }
+
   function dateKey(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   }
@@ -39,10 +43,12 @@
       const name = window.SproutlyPlants.species(id, profiles);
       const plant = window.SPROUTLY_PLANTS.find((item) => item.name === name);
       if (!plant) continue;
-      const schedule = { watering: plant.soilCheckDays, ...intervals[name] };
+      const schedule = { ...defaultIntervals(name), ...profiles[id]?.careIntervals };
       const log = profiles[id]?.careLog || [];
       for (const [type, days] of Object.entries(schedule)) {
+        if (!Number.isInteger(days) || days < 1 || days > 3650) continue;
         const definition = definitions[type];
+        if (!definition) continue;
         const dates = log.filter((entry) => definition.actions.includes(entry.action)
           && parseDate(entry.date) && entry.date <= todayKey).map((entry) => entry.date).sort();
         const latest = dates[dates.length - 1];
@@ -75,5 +81,5 @@
     };
   }
 
-  window.SproutlyCare = { dateKey, parseDate, addDays, events, record };
+  window.SproutlyCare = { dateKey, parseDate, addDays, defaultIntervals, events, record };
 })();

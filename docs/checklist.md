@@ -49,8 +49,8 @@
 - [x] Afbeelding tonen.
 - [x] Lichtinformatie tonen.
 - [x] Waterinformatie tonen.
-- [ ] Uitgebreide verzorgingsinformatie, waaronder verpotten, grondsoort, luchtvochtigheid, temperatuur, groeihoogte, huisdieren, zaaien, snoeien, bemesten en bloei/oogst, waar relevant en betrouwbaar beschikbaar maken op alle plantpagina's.
-- [ ] Een controleerbare bron en verificatiedatum voor verzorgingsinformatie per plant zichtbaar maken en inhoudelijk controleren. Fotobronnen staan al bij de afbeeldingen.
+- [ ] Uitgebreide verzorgingsinformatie, waaronder verpotten, grondsoort, luchtvochtigheid, temperatuur, groeihoogte, huisdieren, zaaien, snoeien, bemesten en bloei/oogst, waar relevant en betrouwbaar beschikbaar maken op alle plantpagina's. Acht plantprofielen tonen de beschikbare detailvelden; voor de overige planten ontbreekt die aanvullende data nog.
+- [ ] Een controleerbare bron en verificatiedatum voor verzorgingsinformatie per plant zichtbaar maken en inhoudelijk controleren. De pagina toont de bestaande bron en controledatum bij acht plantprofielen en geeft voor overige planten aan dat die nog ontbreken. Fotobronnen staan al bij de afbeeldingen.
 - [x] Seizoensadvies aan het halfrond aanpassen via optionele browserlocatie. Coördinaten worden niet opgeslagen; individuele plantadviezen zijn niet op lokaal klimaat afgestemd.
 
 ## 5. Mijn planten
@@ -69,7 +69,7 @@
 - [x] Een lege collectie met duidelijke call-to-action tonen.
 - [x] Een account toevoegen wanneer gegevens op meerdere apparaten beschikbaar moeten zijn. Supabase bewaart accountgegevens en plantstatus; lokale opslag blijft beschikbaar zonder account.
 - [x] Favorieten kunnen filteren in Mijn planten en het filter eenvoudig uitschakelen.
-- [ ] Een verwijderde plant met profiel, foto, logboek en bijbehorende verzorgingsgegevens kunnen herstellen via ongedaan maken of een tijdelijke prullenbak; communiceer het herstelvenster als er een tijdslimiet geldt.
+- [x] Een verwijderde plant met profiel, foto, logboek en bijbehorende verzorgingsgegevens binnen 10 seconden herstellen via Ongedaan maken; de actie wordt ook naar het account gesynchroniseerd.
 - [x] Een bestaande verzorgingslogboekregel kunnen wijzigen, inclusief datum, handeling en notitie; de planning opnieuw berekenen na opslaan.
 
 ## 6. Verzorgingskalender en herinneringen
@@ -78,14 +78,15 @@
 - [x] Het actuele seizoen automatisch bepalen op basis van de datum van de computer van de gebruiker.
 - [x] Verzorgingstaken kunnen afvinken.
 - [x] Afgeronde taken bewaren in de browser.
-- [x] Browsertoestemming voor meldingen kunnen controleren. De homepage kan direct een testmelding tonen; dit plant geen toekomstige meldingen.
+- [x] Browsertoestemming vragen voor verzorgingsmeldingen en duidelijk uitleggen dat de pagina open moet blijven.
 - [x] Een echte kalenderweergave bouwen. De maandweergave ondersteunt vorige/volgende maand, geselecteerde dagen en verzorgingsmomenten.
 - [x] De volgende aardcontrole per plant berekenen op basis van de laatste watergift of aardcontrole; zonder registratie verschijnt een eerste controle vandaag.
 - [x] Het volgende voedings- en verpotmoment berekenen wanneer een interval bekend is en de handeling eerder is geregistreerd.
+- [x] Verzorgingsintervallen per individuele plant aanpassen; een leeg veld gebruikt het bestaande standaardinterval of laat een onbekend interval uitgeschakeld.
 - [ ] Een betrouwbare planning voor snoeien en ontbrekende voedings- en verpotintervallen onderzoeken.
 - [x] De volgende taak opnieuw berekenen na een registratie of verwijdering in het logboek; de kalender toont het eerstvolgende moment per handeling.
 - [x] Kalenderitems op de hoofdpagina één dag of één week kunnen uitstellen.
-- [ ] Echte automatische herinneringen voor toekomstige verzorgingsmomenten toevoegen; de huidige browsertoestemming plant geen meldingen.
+- [x] Verzorgingsmeldingen op de geplande dag tonen wanneer de homepage, Mijn planten of de kalender open is; toestemming is nodig en gesloten browsers ontvangen geen melding.
 - [ ] Onderzoeken hoe herinneringen aan locatie, seizoen en weer kunnen worden aangepast. Het huidige seizoensadvies wisselt alleen op basis van het halfrond.
 - [x] Een overzicht tonen van taken voor vandaag en deze week.
 
@@ -109,10 +110,10 @@
 - [x] Bepalen welke persoonsgegevens nodig zijn. Supabase Auth beheert accountgegevens; de persoonlijke plantstatus wordt in Supabase opgeslagen.
 - [x] Alleen noodzakelijke gegevens opslaan; de website bewaart geen wachtwoord in de plantstatus.
 - [x] Een privacyverklaring schrijven. Een privacy- en cookie-informatiesectie staat op de pagina; juridisch laten controleren blijft aanbevolen.
-- [x] Toestemming vragen voor notificaties. De herinneringsknop vraagt expliciete browsertoestemming voordat een melding wordt gemaakt.
+- [x] Toestemming vragen voor notificaties. De herinneringsknop vraagt expliciete browsertoestemming voordat verzorgingsmeldingen worden ingeschakeld.
 - [x] Toestemming vragen voor browserlocatie. Locatie wordt pas na een expliciete klik opgevraagd en alleen in het huidige bezoek gebruikt.
 - [x] Gebruikersdata kunnen exporteren.
-- [ ] Een exportbestand veilig kunnen importeren, met validatie en een duidelijk overzicht van wat wordt toegevoegd of vervangen vóór bevestiging.
+- [x] Een Growify-export veilig kunnen importeren als samenvoeging, met schema-validatie en een overzicht van nieuwe en al bestaande planten vóór bevestiging; bestaande profielvelden blijven leidend en ontbrekende logboekregels worden toegevoegd.
 - [x] Gebruikersdata kunnen verwijderen.
 - [x] Supabase Auth gebruiken voor inloggen en Row Level Security toepassen op gebruikersgegevens.
 - [x] Wachtwoordherstel via e-mail in de website aanbieden.

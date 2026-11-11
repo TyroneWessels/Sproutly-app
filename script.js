@@ -174,6 +174,8 @@ const logoutButton = document.querySelector("#logout-button");
 const navCount = document.querySelector("#nav-count");
 const accountDataActions = document.querySelector("#account-data-actions");
 const exportDataButton = document.querySelector("#export-data-button");
+const importDataButton = document.querySelector("#import-data-button");
+const importDataFile = document.querySelector("#import-data-file");
 const deleteAccountButton = document.querySelector("#delete-account-button");
 const clearLocalDataButton = document.querySelector("#clear-local-data-button");
 const notificationButton = document.querySelector(".notification-button");
@@ -258,7 +260,7 @@ async function syncStateToServer() {
       if (!currentUser) return;
       try {
         const accountState = await window.SproutlyAccount.getState();
-        const blob = new Blob([JSON.stringify({ exportedAt: new Date().toISOString(), user: currentUser, state: accountState }, null, 2)], { type: "application/json" });
+        const blob = new Blob([JSON.stringify({ format: "growify-export", version: 1, exportedAt: new Date().toISOString(), user: currentUser, state: accountState }, null, 2)], { type: "application/json" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "sproutly-export.json";
@@ -267,6 +269,37 @@ async function syncStateToServer() {
         showToast("Je gegevens zijn geëxporteerd");
       } catch (error) {
         authStatus.textContent = error.message;
+      }
+    });
+
+    importDataButton.addEventListener("click", () => importDataFile.click());
+    importDataFile.addEventListener("change", async () => {
+      const file = importDataFile.files[0];
+      if (!file) return;
+      try {
+        if (file.size > 25 * 1024 * 1024) throw new Error("Dit bestand is groter dan 25 MB.");
+        const imported = window.SproutlyDataTransfer.parseImport(await file.text(), (id, profiles) => {
+          const species = window.SproutlyPlants.species(id, profiles);
+          return window.SPROUTLY_PLANTS.some((plant) => plant.name === species) ? species : null;
+        });
+        const current = await window.SproutlyAccount.getState();
+        const preview = window.SproutlyDataTransfer.preview(current, imported);
+        const summary = [
+          `Nieuwe planten: ${preview.addedPlants}`,
+          `Planten die al bestaan: ${preview.existingPlants}`,
+          `Nieuwe afgeronde taken: ${preview.importedTasks}`
+        ].join("\n");
+        if (!window.confirm(`Importvoorbeeld:\n${summary}\n\nDe bestaande accountgegevens blijven behouden. Bij planten die al bestaan, blijven profielgegevens van dit account leidend; ontbrekende logboekregels worden toegevoegd. Doorgaan?`)) return;
+        const merged = window.SproutlyDataTransfer.merge(current, imported);
+        const saved = await window.SproutlyAccount.saveState(merged);
+        applyServerState(saved);
+        renderAll();
+        showToast("De geëxporteerde plantgegevens zijn samengevoegd.");
+      } catch (error) {
+        console.error("Plantgegevens importeren is mislukt:", error);
+        authStatus.textContent = error.message || "Het bestand kon niet worden geïmporteerd.";
+      } finally {
+        importDataFile.value = "";
       }
     });
 
@@ -642,7 +675,7 @@ function saveState() {
 }
 
 function clearStoredLocalState() {
-  ["sproutly-plants", "sproutly-tasks", "sproutly-profiles", "sproutly-care-overrides"].forEach((key) => localStorage.removeItem(key));
+  ["sproutly-plants", "sproutly-tasks", "sproutly-profiles", "sproutly-care-overrides", "sproutly-sent-care-reminders"].forEach((key) => localStorage.removeItem(key));
 }
 
 function restoreLocalState() {
@@ -1005,25 +1038,42 @@ document.querySelector("#add-plant-button").addEventListener("click", () => {
 });
 
 document.querySelector("#reminder-button").addEventListener("click", async () => {
-  if (typeof Notification === "undefined" || typeof Notification.requestPermission !== "function") {
+  const status = document.querySelector("#reminder-status");
+  if (!("Notification" in window) || typeof Notification.requestPermission !== "function") {
     showToast("Meldingen worden niet ondersteund door deze browser");
+    status.textContent = "Deze browser ondersteunt geen meldingen. Je kunt je taken altijd in de kalender bekijken.";
     return;
   }
   try {
-    const permission = await Notification.requestPermission();
+    const permission = Notification.permission === "default" ? await Notification.requestPermission() : Notification.permission;
     if (permission !== "granted") {
       showToast("Meldingen zijn niet ingeschakeld");
+      status.textContent = "Meldingen zijn niet toegestaan. Je kunt verzorgingsmomenten altijd in de kalender bekijken.";
       return;
     }
-    new Notification("Growify", {
-      body: "Je seizoensherinnering staat klaar."
-    });
-    showToast("Je seizoensherinnering staat klaar");
+    const count = window.SproutlyReminders.notify(getCalendarEvents());
+    status.textContent = "Verzorgingsmeldingen staan aan. Je krijgt een melding op dagen met taken zolang de homepage, Mijn planten of de kalender open is.";
+    showToast(count ? `Melding verstuurd voor ${count} verzorgingsmomenten` : "Verzorgingsmeldingen staan aan");
+    startCareReminderChecks();
   } catch (error) {
-    console.error("Browsermelding kon niet worden ingesteld:", error);
+    console.error("Verzorgingsmeldingen konden niet worden ingesteld:", error);
+    status.textContent = "De herinnering kon niet worden ingesteld. Je kunt de kalender wel blijven gebruiken.";
     showToast("De herinnering kon niet worden ingesteld");
   }
 });
+
+let stopCareReminderChecks = null;
+function startCareReminderChecks() {
+  if (stopCareReminderChecks || !("Notification" in window) || Notification.permission !== "granted") return;
+  stopCareReminderChecks = window.SproutlyReminders.watch(
+    getCalendarEvents,
+    (count) => showToast(`Melding verstuurd voor ${count} verzorgingsmomenten`),
+    (error) => {
+      console.error("Verzorgingsmelding kon niet worden verstuurd:", error);
+      document.querySelector("#reminder-status").textContent = "Een verzorgingsmelding kon niet worden verstuurd. Je kunt de taken in de kalender bekijken.";
+    }
+  );
+}
 
 profileButton.addEventListener("click", openAuthModal);
 authClose.addEventListener("click", closeAuthModal);
@@ -1138,5 +1188,6 @@ renderSeasonalGuidance();
 renderCalendar();
 updateAccountUi();
 initializeSession().then(() => {
+  startCareReminderChecks();
   if (new URLSearchParams(location.search).has("account")) openAuthModal();
 });

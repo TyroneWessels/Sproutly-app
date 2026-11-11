@@ -14,6 +14,8 @@ const logList = document.querySelector("#care-log-list");
 const logSubmit = document.querySelector("#log-submit");
 const cancelLogEdit = document.querySelector("#cancel-log-edit");
 const logEditStatus = document.querySelector("#log-edit-status");
+const careIntervalForm = document.querySelector("#care-interval-form");
+const careIntervalFields = document.querySelector("#care-interval-fields");
 const plantPicker = document.querySelector("#plant-instance-picker");
 const plantSelect = document.querySelector("#plant-instance");
 const skipLink = document.querySelector(".skip-link");
@@ -30,7 +32,29 @@ const fields = {
   favorite: document.querySelector("#detail-favorite"),
   logDate: document.querySelector("#log-date"),
   action: document.querySelector("#log-action"),
-  logNotes: document.querySelector("#log-notes")
+  logNotes: document.querySelector("#log-notes"),
+  wateringDays: document.querySelector("#care-watering-days"),
+  fertilizingDays: document.querySelector("#care-fertilizing-days"),
+  repottingDays: document.querySelector("#care-repotting-days")
+};
+const careIntervalInputs = {
+  watering: fields.wateringDays,
+  fertilizing: fields.fertilizingDays,
+  repotting: fields.repottingDays
+};
+const careIntervalLabels = {
+  watering: "Controleer de aarde",
+  fertilizing: "Controleer of voeding nodig is",
+  repotting: "Controleer of verpotten nodig is",
+  soil: "Grondsoort",
+  humidity: "Luchtvochtigheid",
+  temperature: "Temperatuur",
+  size: "Volwassen grootte",
+  petSafe: "Huisdieren",
+  planting: "Zaaien / planten",
+  pruning: "Snoeien",
+  fertilizingInfo: "Bemesten",
+  growth: "Bloei / oogst"
 };
 
 const requestedId = new URLSearchParams(location.search).get("id");
@@ -116,6 +140,7 @@ function updateControls() {
   editProfile.disabled = !ready || busy;
   cancelProfile.disabled = !ready || busy;
   logFields.disabled = !ready || busy;
+  careIntervalFields.disabled = !ready || busy || !saved;
   document.querySelector("#nav-count").textContent = String(state ? state.savedPlants.length : 0);
 }
 
@@ -190,6 +215,7 @@ function resetLogForm() {
 
 function renderProfile() {
   const profile = state.plantProfiles[selectedId] || {};
+  const defaultCareIntervals = window.SproutlyCare.defaultIntervals(plant.name);
   document.querySelector("#profile-title").textContent = `Gegevens van ${selectedId ? window.SproutlyPlants.label(selectedId, state.savedPlants, state.plantProfiles) : plant.name}`;
   const date = window.SproutlyCare.parseDate(profile.date);
   document.querySelector("#summary-name").textContent = profile.customName || "Niet ingevuld";
@@ -207,6 +233,10 @@ function renderProfile() {
   fields.date.value = editingProfile ? profile.date || "" : "";
   fields.notes.value = editingProfile ? profile.notes || "" : "";
   fields.favorite.checked = editingProfile && Boolean(profile.favorite);
+  for (const [type, input] of Object.entries(careIntervalInputs)) {
+    input.value = profile.careIntervals?.[type] ?? "";
+    input.placeholder = defaultCareIntervals[type] ? `Standaard: ${defaultCareIntervals[type]}` : "Geen standaard";
+  }
   fields.photo.value = "";
   const preview = document.querySelector("#personal-photo-preview");
   preview.hidden = !profile.photo;
@@ -217,6 +247,45 @@ function renderProfile() {
   updatePlantSelector();
   renderLog();
   updateControls();
+}
+
+function renderCareDetails() {
+  const details = window.SPROUTLY_CARE_INFO?.[plant.name];
+  const list = document.querySelector("#plant-care-details");
+  const source = document.querySelector("#plant-care-source");
+  list.replaceChildren();
+  if (!details) {
+    source.textContent = "Een bron en controledatum voor aanvullende verzorgingsinformatie zijn nog niet beschikbaar. Daarom tonen we alleen het basisadvies hierboven.";
+    return;
+  }
+  const fieldsToShow = [
+    ["soil", careIntervalLabels.soil],
+    ["humidity", careIntervalLabels.humidity],
+    ["temperature", careIntervalLabels.temperature],
+    ["size", careIntervalLabels.size],
+    ["petSafe", careIntervalLabels.petSafe],
+    ["planting", careIntervalLabels.planting],
+    ["pruning", careIntervalLabels.pruning],
+    ["fertilizing", careIntervalLabels.fertilizingInfo],
+    ["growth", careIntervalLabels.growth]
+  ];
+  for (const [key, label] of fieldsToShow) {
+    const item = document.createElement("div");
+    const title = document.createElement("dt");
+    const value = document.createElement("dd");
+    title.textContent = label;
+    value.textContent = details[key];
+    item.append(title, value);
+    list.append(item);
+  }
+  source.replaceChildren(document.createTextNode("Bron: "));
+  const link = document.createElement("a");
+  link.href = details.sourceUrl;
+  link.target = "_blank";
+  link.rel = "noreferrer";
+  link.textContent = details.sourceLabel;
+  source.append(link, document.createTextNode(` · gecontroleerd op ${details.lastVerified}. `));
+  source.append(document.createTextNode("Controleer altijd de behoefte van je eigen plant en de informatie van de bron."));
 }
 
 async function save(message, previousState) {
@@ -311,6 +380,7 @@ if (!plant) {
       : plant.name === "Vlinderorchidee"
         ? "Controleer de wortels en het orchideeënschors; laat na het water geven overtollig water goed weglopen."
         : "Voel regelmatig aan de aarde en pas de hoeveelheid water aan de behoefte van de plant aan.";
+  renderCareDetails();
   const image = document.querySelector("#plant-image");
   image.alt = plant.name;
   image.addEventListener("error", window.handlePlantImageError, { once: true });
@@ -337,6 +407,30 @@ if (!plant) {
   });
   logForm.addEventListener("input", () => { logDirty = true; });
   logForm.addEventListener("change", () => { logDirty = true; });
+  careIntervalForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!ready || busy || !selectedId) return;
+    const intervals = {};
+    for (const [type, input] of Object.entries(careIntervalInputs)) {
+      if (!input.value.trim()) continue;
+      const days = Number(input.value);
+      if (!Number.isInteger(days) || days < 1 || days > 3650) {
+        setStatus("Vul voor elk interval een heel aantal dagen tussen 1 en 3650 in, of laat het veld leeg.");
+        input.focus();
+        return;
+      }
+      intervals[type] = days;
+    }
+    const previousState = JSON.parse(JSON.stringify(state));
+    const profile = state.plantProfiles[selectedId] || {};
+    if (Object.keys(intervals).length) profile.careIntervals = intervals;
+    else delete profile.careIntervals;
+    state.plantProfiles[selectedId] = profile;
+    if (await save("Het verzorgingsschema is voor deze plant opgeslagen.", previousState)) renderProfile();
+  });
+  careIntervalForm.addEventListener("input", () => {
+    for (const input of Object.values(careIntervalInputs)) input.setCustomValidity("");
+  });
   cancelLogEdit.addEventListener("click", () => {
     if (busy) return;
     if (logDirty && !window.confirm("Je hebt niet-opgeslagen wijzigingen. Wil je stoppen met bewerken?")) return;

@@ -18,6 +18,24 @@ test("directory pages match their legacy counterparts and use the deployment roo
   }
 });
 
+test("care reminders load on every page that monitors the care schedule", () => {
+  for (const page of ["index", "mijn-planten", "kalender"]) {
+    const source = fs.readFileSync(path.join(root, `${page}.html`), "utf8");
+    assert.match(source, /<script src="care-schedule\.js"><\/script>/, page);
+    assert.match(source, /<script src="care-reminders\.js"><\/script>/, page);
+  }
+});
+
+test("plant and account pages load care details and data-transfer support", () => {
+  const plantPage = fs.readFileSync(path.join(root, "plant.html"), "utf8");
+  const homePage = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  assert.match(plantPage, /<script src="plant-care-info\.js"><\/script>/);
+  assert.match(plantPage, /id="care-interval-form"/);
+  assert.match(plantPage, /id="plant-care-details"/);
+  assert.match(homePage, /<script src="data-transfer\.js"><\/script>/);
+  assert.match(homePage, /id="import-data-button"/);
+});
+
 test("plant URL keeps the species and specimen id in the query string", () => {
   const vm = require("node:vm");
   const context = { window: {} };

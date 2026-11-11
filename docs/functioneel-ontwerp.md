@@ -222,7 +222,7 @@ De status van taken blijft zonder account bewaard in `localStorage`. Voor ingelo
 
 ### 6.7 Herinnering
 
-De homepage kan via de browser Notification API toestemming vragen en direct een testmelding tonen. De kalenderpagina controleert de toestemming. Bij weigering of een niet-ondersteunde browser volgt een tekstuele melding. Er worden geen automatische achtergrondmeldingen voor toekomstige datums gepland.
+De homepage en kalender vragen expliciet toestemming via de browser Notification API. Met toestemming controleren de homepage, Mijn planten en de kalender iedere minuut de bestaande planning en tonen zij een melding voor taken die vandaag gepland zijn. Meldingen worden per taak en datum in de lokale browseropslag bijgehouden om herhaling te voorkomen. De pagina en browser moeten open blijven; er is geen service worker of server-push en dus geen melding nadat de website is gesloten. Bij weigering of een niet-ondersteunde browser volgt een tekstuele melding.
 
 ### 6.8 Verzorgingsoverzicht
 
@@ -307,7 +307,7 @@ De lokale catalogus bevat onder meer `name`, `scientific`, `aliases`, `category`
 
 ### 7.2 Opgeslagen plant
 
-`savedPlants` is een lijst van exemplaar-ID's. Oudere opgeslagen planten kunnen de soortnaam als ID gebruiken. `plantProfiles` bevat per ID het profiel met onder meer `species`, `customName`, `location`, `date`, `notes`, `favorite`, `photo` en `careLog`. Een eigen foto wordt als data-URL in het profiel opgeslagen; het gekozen bestand mag maximaal 500 KB zijn.
+`savedPlants` is een lijst van exemplaar-ID's. Oudere opgeslagen planten kunnen de soortnaam als ID gebruiken. `plantProfiles` bevat per ID het profiel met onder meer `species`, `customName`, `location`, `date`, `notes`, `favorite`, `photo`, `careLog` en optionele `careIntervals`. Aangepaste intervallen zijn per exemplaar; lege velden laten het bestaande standaardinterval gelden. Een eigen foto wordt als data-URL in het profiel opgeslagen; het gekozen bestand mag maximaal 500 KB zijn.
 
 ### 7.3 Verzorgingstaak
 
@@ -315,7 +315,7 @@ Een logboekregel bevat een ID, datum, handeling en notitie. Verzorgingsmomenten 
 
 ### 7.4 Account en serverstatus
 
-Supabase Auth beheert het account en de sessie. De tabel `sproutly_user_data` koppelt een gebruikers-ID aan een JSONB-status met `savedPlants`, `plantProfiles`, `completedTasks` en `careOverrides`. De plantstatus bevat geen wachtwoord.
+Supabase Auth beheert het account en de sessie. De tabel `sproutly_user_data` koppelt een gebruikers-ID aan een JSONB-status met `savedPlants`, `plantProfiles`, `completedTasks` en `careOverrides`. De plantstatus bevat geen wachtwoord. Een Growify-export kan worden geïmporteerd als samenvoeging, na schema-validatie en een preview. Bestaande profielvelden blijven leidend; ontbrekende logboekregels, taken en planten worden toegevoegd.
 
 ## 8. Niet-functionele eisen
 
@@ -414,7 +414,7 @@ De optionele rondleiding start op de homepage en bezoekt de pagina's voor zoeken
 
 **Wachtwoordherstel:** de website biedt een herstelverzoek via e-mail en een formulier voor een nieuw wachtwoord. De toegestane Supabase-redirects en e-mailinstellingen moeten nog worden ingericht en de volledige stroom moet met een echt account worden getest.
 
-Eerder vastgelegde openstaande punten blijven onder meer automatische geplande herinneringen, gebruikerstesten met oudere en minder digitaal vaardige gebruikers, schermlezertesten en geteste productieback-ups. Een browsertestmelding is geen automatische herinnering.
+Eerder vastgelegde openstaande punten blijven onder meer meldingen wanneer de browser gesloten is, gebruikerstesten met oudere en minder digitaal vaardige gebruikers, schermlezertesten en geteste productieback-ups.
 
 Andere mogelijke uitbreidingen:
 

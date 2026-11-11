@@ -20,13 +20,27 @@ const savedGrid = document.querySelector("#saved-plants-grid");
 const emptyState = document.querySelector("#saved-empty");
 const favoritesFilter = document.querySelector("#favorites-filter");
 const favoritesEmpty = document.querySelector("#favorites-empty");
-const toast = (message) => {
+const toast = (message, actionLabel, action) => {
   const toastElement = document.querySelector("#page-toast");
   if (!toastElement) return;
-  toastElement.textContent = message;
+  toastElement.replaceChildren();
+  const text = document.createElement("span");
+  text.textContent = message;
+  toastElement.append(text);
+  if (actionLabel && action) {
+    const button = document.createElement("button");
+    button.className = "toast-action";
+    button.type = "button";
+    button.textContent = actionLabel;
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      await action();
+    }, { once: true });
+    toastElement.append(button);
+  }
   toastElement.classList.add("show");
   clearTimeout(toast.timeout);
-  toast.timeout = setTimeout(() => toastElement.classList.remove("show"), 2800);
+  toast.timeout = setTimeout(() => toastElement.classList.remove("show"), action ? 10000 : 2800);
 };
 
 function updateNavCount() {
@@ -121,9 +135,17 @@ function renderSavedPlants() {
       const previousState = structuredClone(accountState);
       const previousNames = new Set(savedNames);
       const previousTasks = new Set(completedTasks);
+      const previousPosition = [...savedNames].indexOf(id);
+      const previousProfile = structuredClone(accountState.plantProfiles[id]);
+      previousState.savedPlants = [...previousNames];
+      previousState.completedTasks = [...previousTasks];
       savedNames.delete(id);
       delete accountState.plantProfiles[id];
       const belongsToPlant = (taskId) => taskId.startsWith(`calendar-${id}-`) || taskId.startsWith(`soil-check-${id}-`);
+      const removedTasks = [...completedTasks].filter(belongsToPlant);
+      const removedOverrides = Object.fromEntries(
+        Object.entries(accountState.careOverrides).filter(([taskId]) => belongsToPlant(taskId))
+      );
       completedTasks = new Set([...completedTasks].filter((taskId) => !belongsToPlant(taskId)));
       Object.keys(accountState.careOverrides).filter(belongsToPlant).forEach((taskId) => delete accountState.careOverrides[taskId]);
       try {
@@ -147,9 +169,48 @@ function renderSavedPlants() {
       updateNavCount();
       renderSavedPlants();
       if (calendarGrid) renderCalendar();
-      toast(`${name} is verwijderd uit Mijn planten.`);
+      toast(`${name} is verwijderd uit Mijn planten.`, "Ongedaan maken", async () => {
+        if (savedNames.has(id)) {
+          toast(`${name} staat alweer in Mijn planten; de eerdere gegevens zijn niet overschreven.`);
+          return;
+        }
+        const deletedState = structuredClone(accountState);
+        const deletedNames = new Set(savedNames);
+        const deletedTasks = new Set(completedTasks);
+        const restoredNames = [...savedNames];
+        restoredNames.splice(Math.max(0, Math.min(previousPosition, restoredNames.length)), 0, id);
+        savedNames = new Set(restoredNames);
+        completedTasks = new Set([...completedTasks, ...removedTasks]);
+        if (previousProfile === undefined) delete accountState.plantProfiles[id];
+        else accountState.plantProfiles[id] = previousProfile;
+        accountState.completedTasks = [...completedTasks];
+        accountState.careOverrides = { ...accountState.careOverrides, ...removedOverrides };
+        try {
+          persistLocalState();
+          if (!await syncAccountState()) {
+            savedNames = deletedNames;
+            completedTasks = deletedTasks;
+            accountState = deletedState;
+            return;
+          }
+          updateNavCount();
+          renderSavedPlants();
+          if (calendarGrid) renderCalendar();
+          toast(`${name} en de gegevens zijn hersteld.`);
+        } catch (error) {
+          savedNames = deletedNames;
+          completedTasks = deletedTasks;
+          accountState = deletedState;
+          console.error("Plant herstellen is mislukt:", error);
+          toast("De plant kon niet worden hersteld. Probeer het opnieuw.");
+        }
+      });
     });
   });
+}
+
+function getCareEvents() {
+  return window.SproutlyCare.events(savedNames, accountState.plantProfiles, accountState.careOverrides);
 }
 
 favoritesFilter?.addEventListener("change", renderSavedPlants);
@@ -172,10 +233,6 @@ if (calendarGrid) {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${date.getFullYear()}-${month}-${day}`;
-  }
-
-  function getCareEvents() {
-    return window.SproutlyCare.events(savedNames, accountState.plantProfiles, accountState.careOverrides);
   }
 
   function selectDate(date) {
@@ -278,6 +335,21 @@ if (calendarGrid) {
   renderCalendar();
 }
 
+let stopCareReminderChecks = null;
+function startCareReminderChecks() {
+  if (stopCareReminderChecks || !("Notification" in window) || Notification.permission !== "granted") return;
+  stopCareReminderChecks = window.SproutlyReminders.watch(
+    getCareEvents,
+    (count) => toast(`Melding verstuurd voor ${count} verzorgingsmomenten`),
+    (error) => {
+      console.error("Verzorgingsmelding kon niet worden verstuurd:", error);
+      toast("Een verzorgingsmelding kon niet worden verstuurd. Bekijk de kalender voor je taken.");
+      const status = document.querySelector("#reminder-status");
+      if (status) status.textContent = "Een verzorgingsmelding kon niet worden verstuurd. Je kunt de taken in de kalender bekijken.";
+    }
+  );
+}
+
 const reminderButton = document.querySelector("#reminder-button");
 reminderButton?.addEventListener("click", async () => {
   const status = document.querySelector("#reminder-status");
@@ -287,15 +359,23 @@ reminderButton?.addEventListener("click", async () => {
   }
   try {
     const permission = Notification.permission === "default" ? await Notification.requestPermission() : Notification.permission;
-    status.textContent = permission === "granted"
-      ? "Browsermeldingen zijn toegestaan. Automatische verzorgingsmeldingen zijn nog niet beschikbaar; bekijk de kalender voor uw taken."
-      : "Browsermeldingen zijn niet ingeschakeld. U kunt verzorgingsmomenten altijd in de kalender bekijken.";
+    if (permission !== "granted") {
+      status.textContent = "Meldingen zijn niet ingeschakeld. U kunt verzorgingsmomenten altijd in de kalender bekijken.";
+      return;
+    }
+    const count = window.SproutlyReminders.notify(getCareEvents());
+    status.textContent = "Verzorgingsmeldingen staan aan. U krijgt een melding op dagen met taken zolang de homepage, Mijn planten of de kalender open is.";
+    if (count) toast(`Melding verstuurd voor ${count} verzorgingsmomenten`);
+    startCareReminderChecks();
   } catch (error) {
-    console.error("Toestemming voor browsermeldingen kon niet worden gecontroleerd:", error);
-    status.textContent = "De browserinstelling kon niet worden gecontroleerd. U kunt de kalender wel blijven gebruiken.";
+    console.error("Verzorgingsmeldingen konden niet worden ingesteld:", error);
+    status.textContent = "De herinnering kon niet worden ingesteld. U kunt de kalender wel blijven gebruiken.";
   }
 });
 
 renderSavedPlants();
 updateNavCount();
 const pageSession = initializePageSession();
+pageSession.then((ready) => {
+  if (ready) startCareReminderChecks();
+});

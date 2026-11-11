@@ -68,6 +68,11 @@
             <span class="care-water-icon" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M24 7c-4 6-12 14-12 22a12 12 0 0 0 24 0C36 21 28 13 24 7Z" fill="currentColor" opacity=".18"/><path d="M24 7c-4 6-12 14-12 22a12 12 0 0 0 24 0C36 21 28 13 24 7Zm-6 23a6 6 0 0 0 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
             <div><h3>Een beetje waterliefde</h3><p><span id="plant-water"></span> De waterbehoefte hangt ook af van het seizoen en de standplaats; voorkom dat de wortels langdurig in water staan.</p></div>
           </div>
+          <section class="plant-care-extra" aria-labelledby="plant-care-extra-title">
+            <h3 id="plant-care-extra-title">Meer verzorgingsinformatie</h3>
+            <dl class="plant-info-grid" id="plant-care-details"></dl>
+            <p class="plant-care-source" id="plant-care-source" role="note"></p>
+          </section>
           <a class="care-calendar-link" href="kalender/">Bekijk de verzorgingskalender</a>
         </section>
         <p id="plant-status" class="plant-status" role="status" aria-live="polite">Je gegevens worden geladen…</p>
@@ -102,6 +107,20 @@
               </fieldset>
             </form>
           </section>
+          <section class="plant-detail-panel" aria-labelledby="care-interval-title">
+            <p class="eyebrow">Jouw planning</p><h2 id="care-interval-title">Pas intervallen aan</h2>
+            <p>Stel per plant in na hoeveel dagen Growify een volgend controlemoment plant. Laat een veld leeg voor het standaardinterval. De controle is een herinnering om te kijken, niet automatisch om water of voeding te geven.</p>
+            <form id="care-interval-form" class="detail-form">
+              <fieldset id="care-interval-fields" disabled>
+                <div class="detail-form-grid">
+                  <label>Aarde controleren (dagen)<input id="care-watering-days" type="number" min="1" max="3650" step="1" inputmode="numeric" /></label>
+                  <label>Voeding controleren (dagen)<input id="care-fertilizing-days" type="number" min="1" max="3650" step="1" inputmode="numeric" /></label>
+                  <label>Verpotten controleren (dagen)<input id="care-repotting-days" type="number" min="1" max="3650" step="1" inputmode="numeric" /></label>
+                </div>
+                <button class="primary-button" type="submit">Verzorgingsschema opslaan</button>
+              </fieldset>
+            </form>
+          </section>
           <section class="plant-detail-panel" aria-labelledby="log-title">
             <p class="eyebrow">Verzorgingslogboek</p><h2 id="log-title">Wat heb je gedaan?</h2>
             <p>Schrijf op wanneer je voor je plant hebt gezorgd. De kalender berekent het volgende moment vanaf de laatst geregistreerde datum.</p>
@@ -127,6 +146,7 @@
   <script src="plantencollectie.js"></script>
   <script src="plant-instances.js"></script>
   <script src="care-schedule.js"></script>
+  <script src="plant-care-info.js"></script>
   <script src="assets/supabase-client.js"></script>
   <script src="account.js"></script>
   <script src="rondleiding.js"></script>

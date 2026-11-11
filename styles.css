@@ -200,6 +200,9 @@ h2 span { color: #cf7d5f; }
 .plant-detail-panel { margin-top: 35px; padding: 28px; border-radius: 10px; background: var(--paper); line-height: 1.6; }
 .plant-detail-panel h2 { font-size: clamp(28px, 4vw, 38px); line-height: 1.15; }
 .plant-detail-panel > p:not(.eyebrow) { color: var(--muted); }
+.plant-care-extra { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(51, 91, 61, .15); }
+.plant-care-extra h3 { margin: 0; font-size: 20px; }
+.plant-care-source { color: var(--muted); font-size: 14px; line-height: 1.55; }
 .detail-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
 .plant-status { margin-top: 25px; padding: 14px; border-radius: 6px; background: var(--light-green); line-height: 1.5; }
 .personal-photo-preview { display: block; max-width: 220px; max-height: 220px; margin: 15px 0; border-radius: 8px; object-fit: contain; }
@@ -370,6 +373,8 @@ h2 span { color: #cf7d5f; }
 .plant-profile-form textarea { resize: vertical; }
 .toast { position: fixed; right: 22px; bottom: 22px; z-index: 20; padding: 13px 17px; border-radius: 7px; background: var(--ink); color: #fff; font-size: 12px; opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s ease; }
 .toast.show { opacity: 1; transform: translateY(0); }
+.toast.show { pointer-events: auto; }
+.toast-action { margin-left: 12px; border: 0; background: transparent; color: #fff; font: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 @media (max-width: 850px) {

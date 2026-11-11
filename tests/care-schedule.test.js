@@ -54,6 +54,23 @@ test("unknown and overdue dates, postponement, and unsupported actions", () => {
   assert.equal(care.events(["Monstera"], {}, { [fresh.taskId]: "2026-11-16" }, new Date(2026, 10, 10))[0].date, "2026-11-16");
 });
 
+test("custom care intervals apply to one plant and can schedule an otherwise unknown interval", () => {
+  const profiles = {
+    first: { species: "Monstera", careIntervals: { watering: 3, fertilizing: 5 }, careLog: [
+      entry("2026-11-06", "Water gegeven"), entry("2026-11-04", "Voeding gegeven")
+    ] },
+    second: { species: "Monstera", careLog: [entry("2026-11-06", "Water gegeven")] }
+  };
+  const events = care.events(["first", "second"], profiles, {}, today);
+  const firstWater = events.find((item) => item.plantId === "first" && item.type === "watering");
+  const firstFeed = events.find((item) => item.plantId === "first" && item.type === "fertilizing");
+  const secondWater = events.find((item) => item.plantId === "second" && item.type === "watering");
+
+  assert.equal(firstWater.dueDate, "2026-11-09");
+  assert.equal(firstFeed.dueDate, "2026-11-09");
+  assert.equal(secondWater.dueDate, "2026-11-13");
+});
+
 test("recording a calendar action uses today and recalculates; full logs fail", () => {
   const profiles = { Monstera: { careLog: [entry("2026-11-01", "Water gegeven")] } };
   const event = care.events(["Monstera"], profiles, {}, today)[0];

@@ -15,6 +15,10 @@ Op de homepage kun je met **Bekijk de korte rondleiding** uitleg krijgen over zo
 Klik op het hartje op een plantkaart of open de details en kies **Aan mijn planten toevoegen**.
 In de details van een opgeslagen plant kun je een eigen naam, locatie, datum, foto, notities en favorietstatus bewaren.
 In **Mijn planten** kun je met **Alleen mijn favorieten tonen** de lijst filteren. Schakel het vinkje uit om alle planten weer te zien.
+Bij een opgeslagen plant kun je ook de controle-intervallen per exemplaar aanpassen. Laat een veld leeg om het standaardinterval te gebruiken; een interval instellen plant alleen een controle en is geen automatisch advies om water of voeding te geven.
+Na het verwijderen van een plant kun je deze binnen 10 seconden via **Ongedaan maken** terugzetten, inclusief het profiel en verzorgingslogboek.
+
+Op sommige plantpagina's staat aanvullende verzorgingsinformatie met een bron en controledatum. Waar die gegevens nog niet beschikbaar zijn, vermeldt Growify dat expliciet.
 
 ## Verzorging bijhouden
 
@@ -28,7 +32,7 @@ De maandkalender toont geplande water-, bemestings- en verpotmomenten. Open een 
 
 Met **Gebruik mijn locatie** kan Growify na toestemming het seizoensadvies aanpassen aan het halfrond. De locatie wordt niet opgeslagen.
 
-Met **Herinnering instellen** vraagt Growify toestemming voor een browsermelding. Bij weigering blijft de website gewoon bruikbaar.
+Met **Verzorgingsmeldingen inschakelen** vraagt Growify toestemming voor browsermeldingen. Op dagen met geplande verzorging verschijnt een melding zolang de homepage, Mijn planten of de kalender open is. De browser moet open blijven; als je Growify sluit, komen er geen meldingen binnen. Bij weigering blijft de website gewoon bruikbaar en kun je de taken in de kalender bekijken.
 
 ## Account en privacy
 
@@ -39,6 +43,7 @@ In het accountvenster kun je:
 - uitloggen;
 - via **Wachtwoord vergeten?** een herstellink aanvragen en daarmee een nieuw wachtwoord kiezen;
 - je gegevens exporteren als JSON;
+- een eerder Growify-exportbestand valideren en samenvoegen met je huidige account. De import toont eerst een overzicht; bestaande profielgegevens blijven leidend en ontbrekende logboekregels worden toegevoegd;
 - je account en servergegevens verwijderen.
 
 Onderaan de pagina kun je lokale browsergegevens wissen. Dit verwijdert alleen gegevens van die browser en heeft geen invloed op serverdata van een account.
